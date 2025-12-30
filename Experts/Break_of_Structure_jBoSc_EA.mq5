@@ -6,7 +6,7 @@
 #property copyright "Copyright 2024, MetaQuotes Ltd."
 #property link      "https://www.mql5.com"
 #property version   "1.00"
-
+// from https://www.mql5.com/en/articles/15017
 #include <Trade/Trade.mqh>
 CTrade obj_Trade;
 
