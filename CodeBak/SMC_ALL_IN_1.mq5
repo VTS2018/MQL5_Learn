@@ -7,7 +7,7 @@
 #property link      "https://www.mql5.com/en/users/johnhlomohang/"
 #property version   "1.01"
 #property description "Unified SMC: FVG + Order Blocks + BOS. Detect + Draw + Trade."
-// https://www.mql5.com/en/articles/16340
+
 #include <Trade/Trade.mqh>
 #include <Trade/PositionInfo.mqh>
 
