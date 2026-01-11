@@ -22,9 +22,11 @@ input int    InpBreakScanLimit = 0;   // 突破扫描范围(0=扫描到最新K�
 //+------------------------------------------------------------------+
 int OnInit()
 {
-   // 清理旧的图表对象（可选）
+   // 清理旧的图表对象（包括箭头、箭头线和文本）
    ObjectsDeleteAll(0, "BOS_", 0, OBJ_ARROW);
+   ObjectsDeleteAll(0, "BOS_", 0, OBJ_TEXT);         // 清理摆动点文本对象
    ObjectsDeleteAll(0, "BREAK_", 0, OBJ_ARROWED_LINE);
+   ObjectsDeleteAll(0, "BREAK_", 0, OBJ_TEXT);       // 清理突破线文本对象
    
    if(InpShowHistory)
    {
@@ -139,9 +141,15 @@ void CheckHistoricalBreak(int swing_bar, double swing_price, bool isHigh)
 //+------------------------------------------------------------------+
 void OnDeinit(const int reason)
 {
-   // 可选：移除时清理对象
-   // ObjectsDeleteAll(0, "BOS_", 0, OBJ_ARROW);
-   // ObjectsDeleteAll(0, "BREAK_", 0, OBJ_ARROWED_LINE);
+   // 移除EA时清理所有对象，切换周期时不清理
+   if(reason == REASON_REMOVE)
+   {
+      ObjectsDeleteAll(0, "BOS_", 0, OBJ_ARROW);
+      ObjectsDeleteAll(0, "BOS_", 0, OBJ_TEXT);
+      ObjectsDeleteAll(0, "BREAK_", 0, OBJ_ARROWED_LINE);
+      ObjectsDeleteAll(0, "BREAK_", 0, OBJ_TEXT);
+      Print("已清理所有BOS标记对象");
+   }
 }
 
 //+------------------------------------------------------------------+
