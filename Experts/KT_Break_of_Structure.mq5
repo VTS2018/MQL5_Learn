@@ -44,8 +44,12 @@ void ScanHistoricalBOS()
    int totalBars = iBars(_Symbol, _Period);
    int startBar = MathMin(InpHistoryBars, totalBars - InpLength - 1);
    
+   // 计算历史扫描的终止位置：确保不与实时扫描位置重叠
+   // 历史扫描应停止在 InpScanLimit + 1 之前，避免重复检测
+   int endBar = MathMax(InpLength + 1, InpScanLimit + 1);
+   
    // 从旧到新扫描（避免最近的K线数据不完整）
-   for(int curr_bar = startBar; curr_bar >= InpLength + 1; curr_bar--)
+   for(int curr_bar = startBar; curr_bar >= endBar; curr_bar--)
    {
       bool isSwingHigh = true;
       bool isSwingLow = true;
@@ -187,16 +191,26 @@ void OnTick()
          swing_H = high(curr_bar);
          swing_H_bar = curr_bar;
          string objName = "BOS_H_" + TimeToString(time(curr_bar), TIME_DATE|TIME_SECONDS);
-         Print("实时摆动高点 @ BAR ", curr_bar, " Price: ", high(curr_bar));
-         drawSwingPoint(objName, time(curr_bar), high(curr_bar), 77, clrBlue, -1);
+         
+         // 检查是否已存在（避免历史扫描和实时扫描重复标记）
+         if(ObjectFind(0, objName) < 0)
+         {
+            Print("实时摆动高点 @ BAR ", curr_bar, " Price: ", high(curr_bar));
+            drawSwingPoint(objName, time(curr_bar), high(curr_bar), 77, clrBlue, -1);
+         }
       }
       if(isSwingLow)
       {
          swing_L = low(curr_bar);
          swing_L_bar = curr_bar;
          string objName = "BOS_L_" + TimeToString(time(curr_bar), TIME_DATE|TIME_SECONDS);
-         Print("实时摆动低点 @ BAR ", curr_bar, " Price: ", low(curr_bar));
-         drawSwingPoint(objName, time(curr_bar), low(curr_bar), 77, clrRed, 1);
+         
+         // 检查是否已存在（避免历史扫描和实时扫描重复标记）
+         if(ObjectFind(0, objName) < 0)
+         {
+            Print("实时摆动低点 @ BAR ", curr_bar, " Price: ", low(curr_bar));
+            drawSwingPoint(objName, time(curr_bar), low(curr_bar), 77, clrRed, 1);
+         }
       }
    }
    
