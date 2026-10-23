@@ -656,6 +656,13 @@ int OnCalculate(const int rates_total,
     if (!g_ktFinderMt7Authorized)
         return(0);
 
+    if (rates_total <= 0)
+        return(0);
+
+    // 使用已同步并明确设置为 Series 的时间数组，避免直接依赖
+    // OnCalculate() 输入数组的未确定索引方向。
+    datetime current_bar_time = g_ktFinderTime[0];
+
     // ----------------- NEW 切换到真实环境 可以区分Tick触发类型的执行-----------------
 
     // --- 逻辑判断与计数 ---
@@ -701,7 +708,7 @@ int OnCalculate(const int rates_total,
         }
     }
     // 2. 判断是否是新 K 线触发
-    else if (time[0] > last_bar_time)
+    else if (current_bar_time > last_bar_time)
     {
         g_Stats.Reset();
 
@@ -748,10 +755,10 @@ int OnCalculate(const int rates_total,
     }
 
     // 在更新 last_bar_time 之前捕获"是否新K线"状态
-    bool is_new_bar = (time[0] > last_bar_time);
+    bool is_new_bar = (current_bar_time > last_bar_time);
 
     // 4. 更新全局静态变量
-    last_bar_time = time[0];
+    last_bar_time = current_bar_time;
     last_tick_time = current_time;
 
     if (!Is_EA_Mode)
@@ -763,7 +770,7 @@ int OnCalculate(const int rates_total,
             "Trigger: " + trigger_type + "\n" +
             "Trigger Time: " + TimeToString(current_time, TIME_SECONDS) + "\n" +
             "--------------------------------------\n" +
-            "K[0] Start Time: " + TimeToString(time[0], TIME_MINUTES) + "\n" +
+            "K[0] Start Time: " + TimeToString(current_bar_time, TIME_MINUTES) + "\n" +
             "Current Bid: " + DoubleToString(Bid, Digits) + "\n" +
             "Current Ask: " + DoubleToString(Ask, Digits) + "\n" +
             "K-Line Total: " + IntegerToString(rates_total) + "\n" +
