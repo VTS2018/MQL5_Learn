@@ -1744,10 +1744,36 @@ bool CollectAtrDisplaySnapshot(AtrDisplaySnapshot &snap)
 
     snap.current_price = Close[0];
     snap.atr_value = KT_GetATR(_Symbol, _Period, snap.atr_period, 0);
+
+    // ATR 数据尚未就绪时保留上一轮图形，避免用零距离覆盖止损价格。
+    if(snap.atr_value <= 0.0)
+        return false;
+
     snap.sl_distance = snap.atr_value * snap.atr_mult;
 
     snap.buy_sl_price = snap.current_price - snap.sl_distance;
     snap.sell_sl_price = snap.current_price + snap.sl_distance;
+
+    // [临时调试] 每秒记录一次 ATR 和买卖止损计算结果，定位 ATR 为 0 或价格相同的问题。
+    // 暂时注销，保留代码供以后排查 ATR 问题时恢复。
+    // static datetime last_atr_debug_time = 0;
+    // datetime current_debug_time = TimeCurrent();
+    // if(current_debug_time != last_atr_debug_time)
+    // {
+    //     last_atr_debug_time = current_debug_time;
+    //     PrintFormat("[ATR DEBUG] symbol=%s period=%d atr_period=%d atr_mult=%.4f current=%.10f atr=%.10f distance=%.10f buy_sl=%.10f sell_sl=%.10f same=%s error=%d",
+    //                 _Symbol,
+    //                 (int)_Period,
+    //                 snap.atr_period,
+    //                 snap.atr_mult,
+    //                 snap.current_price,
+    //                 snap.atr_value,
+    //                 snap.sl_distance,
+    //                 snap.buy_sl_price,
+    //                 snap.sell_sl_price,
+    //                 (snap.buy_sl_price == snap.sell_sl_price) ? "true" : "false",
+    //                 GetLastError());
+    // }
 
     snap.yesterday_close = iClose(_Symbol, PERIOD_D1, 1);
     snap.today_open = iOpen(_Symbol, PERIOD_D1, 0);

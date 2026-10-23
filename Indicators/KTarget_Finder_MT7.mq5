@@ -67,6 +67,26 @@ double   g_ktFinderClose[];
 datetime g_ktFinderTime[];
 int      g_ktFinderBars = 0;
 
+//#region MARK: 模块--ATR句柄生命周期管理
+int    g_ktFinderAtrHandle = INVALID_HANDLE;
+string g_ktFinderAtrSymbol = "";
+int    g_ktFinderAtrTimeframe = -1;
+int    g_ktFinderAtrPeriod = 0;
+
+void KT_ReleaseATRHandle()
+{
+    if(g_ktFinderAtrHandle != INVALID_HANDLE)
+    {
+        IndicatorRelease(g_ktFinderAtrHandle);
+        g_ktFinderAtrHandle = INVALID_HANDLE;
+    }
+
+    g_ktFinderAtrSymbol = "";
+    g_ktFinderAtrTimeframe = -1;
+    g_ktFinderAtrPeriod = 0;
+}
+//#endregion
+
 #define MODE_TICKSIZE  1
 #define MODE_TICKVALUE 2
 #define MODE_SPREAD    3
@@ -85,17 +105,63 @@ double MarketInfo(const string symbol, const int mode)
     return 0.0;
 }
 
+//#region MARK: 模块--ATR数据读取
 double KT_GetATR(const string symbol, const ENUM_TIMEFRAMES timeframe, const int period, const int shift)
 {
-    int handle = iATR(symbol, timeframe, period);
-    if(handle == INVALID_HANDLE) return 0.0;
+    if(g_ktFinderAtrHandle == INVALID_HANDLE ||
+       g_ktFinderAtrSymbol != symbol ||
+       g_ktFinderAtrTimeframe != (int)timeframe ||
+       g_ktFinderAtrPeriod != period)
+    {
+        KT_ReleaseATRHandle();
+
+        ResetLastError();
+        g_ktFinderAtrHandle = iATR(symbol, timeframe, period);
+        if(g_ktFinderAtrHandle == INVALID_HANDLE)
+        {
+            PrintFormat("[ATR] iATR handle creation failed: symbol=%s timeframe=%d period=%d error=%d",
+                        symbol, (int)timeframe, period, GetLastError());
+            return 0.0;
+        }
+
+        g_ktFinderAtrSymbol = symbol;
+        g_ktFinderAtrTimeframe = (int)timeframe;
+        g_ktFinderAtrPeriod = period;
+    }
+
+    int calculated = BarsCalculated(g_ktFinderAtrHandle);
+    if(calculated < shift + 1)
+    {
+        static datetime last_not_ready_log = 0;
+        datetime now = TimeCurrent();
+        if(now != last_not_ready_log)
+        {
+            last_not_ready_log = now;
+            PrintFormat("[ATR] data not ready: symbol=%s timeframe=%d period=%d shift=%d calculated=%d error=%d",
+                        symbol, (int)timeframe, period, shift, calculated, GetLastError());
+        }
+        return 0.0;
+    }
+
     double values[1];
-    double result = 0.0;
-    if(CopyBuffer(handle, 0, shift, 1, values) == 1)
-        result = values[0];
-    IndicatorRelease(handle);
-    return result;
+    ResetLastError();
+    int copied = CopyBuffer(g_ktFinderAtrHandle, 0, shift, 1, values);
+    if(copied != 1)
+    {
+        static datetime last_copy_log = 0;
+        datetime now = TimeCurrent();
+        if(now != last_copy_log)
+        {
+            last_copy_log = now;
+            PrintFormat("[ATR] CopyBuffer failed: symbol=%s timeframe=%d period=%d shift=%d calculated=%d copied=%d error=%d",
+                        symbol, (int)timeframe, period, shift, calculated, copied, GetLastError());
+        }
+        return 0.0;
+    }
+
+    return values[0];
 }
+//#endregion
 
 #include <KTLicense/Products/KTarget_Finder_MT7.mqh>
 #include <K5/K_Data.mqh>
@@ -534,6 +600,8 @@ void OnDeinit(const int reason)
             " Symbol=", _Symbol,
             " Period=", _Period,
             " InstanceSource=", KTarget_InstanceSource());
+
+        KT_ReleaseATRHandle();
 
     if (!Is_EA_Mode)
     {
