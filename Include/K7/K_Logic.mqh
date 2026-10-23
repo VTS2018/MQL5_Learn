@@ -3093,7 +3093,8 @@ bool IsSignalPriceInvalidated(int signal_index, double sl_price, bool is_bullish
 
 // 计算空间因子 (ATR Helper)
 double Calculate_Space_Factor(string sym, int period, double p1, double p2, int shift) {
-    double atr = KT_GetATR(sym, (ENUM_TIMEFRAMES)period, 14, shift);
+   int atr_period = GetAdaptiveATRPeriod(period);
+   double atr = KT_GetATR(sym, (ENUM_TIMEFRAMES)period, atr_period, shift);
    if(atr <= 0) return 0;
    return MathAbs(p2 - p1) / atr;
 }
@@ -3170,11 +3171,11 @@ SignalQuality EvaluateSignal(
    sq.grade = GRADE_NONE;
    
    // --- A. 基础计算 ---
-    double atr = KT_GetATR(sym, (ENUM_TIMEFRAMES)period, 14, breakout_idx);
-    if(atr==0) atr = _Point;
+   // double atr = KT_GetATR(sym, (ENUM_TIMEFRAMES)period, 14, breakout_idx);
+   // if(atr==0) atr = _Point;
    //上面虽然计算出来了atr 但是好像没有用到
 
-    double close_price = iClose(sym, (ENUM_TIMEFRAMES)period, breakout_idx);
+   double close_price = iClose(sym, (ENUM_TIMEFRAMES)period, breakout_idx);
    int n_geo = n_geo_input;
 
    // ✅ 修复：使用全局参数 DB_Threshold_Candles 进行动态判断
@@ -3654,21 +3655,25 @@ void Init_Buffer()
     // 缓冲区映射设置 (无变化)
     // MQL4 的 SetIndexStyle/SetIndexArrow 已由 MQL5 PlotIndexSet* 替代。
     SetIndexBuffer(0, BullishTargetBuffer, INDICATOR_DATA);
+    ArraySetAsSeries(BullishTargetBuffer, true);
     PlotIndexSetInteger(0, PLOT_DRAW_TYPE, DRAW_ARROW);
     PlotIndexSetInteger(0, PLOT_ARROW, ARROW_CODE_UP);
     PlotIndexSetInteger(0, PLOT_LINE_COLOR, clrBlue);
 
     SetIndexBuffer(1, BearishTargetBuffer, INDICATOR_DATA);
+    ArraySetAsSeries(BearishTargetBuffer, true);
     PlotIndexSetInteger(1, PLOT_DRAW_TYPE, DRAW_ARROW);
     PlotIndexSetInteger(1, PLOT_ARROW, ARROW_CODE_DOWN);
     PlotIndexSetInteger(1, PLOT_LINE_COLOR, clrRed);
 
     SetIndexBuffer(2, BullishSignalBuffer, INDICATOR_DATA);
+    ArraySetAsSeries(BullishSignalBuffer, true);
     PlotIndexSetInteger(2, PLOT_DRAW_TYPE, DRAW_ARROW);
     PlotIndexSetInteger(2, PLOT_ARROW, ARROW_CODE_SIGNAL_UP);
     PlotIndexSetInteger(2, PLOT_LINE_COLOR, clrLimeGreen);
 
     SetIndexBuffer(3, BearishSignalBuffer, INDICATOR_DATA);
+    ArraySetAsSeries(BearishSignalBuffer, true);
     PlotIndexSetInteger(3, PLOT_DRAW_TYPE, DRAW_ARROW);
     PlotIndexSetInteger(3, PLOT_ARROW, ARROW_CODE_SIGNAL_DOWN);
     PlotIndexSetInteger(3, PLOT_LINE_COLOR, clrDarkViolet);
