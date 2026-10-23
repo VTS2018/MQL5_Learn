@@ -39,47 +39,50 @@ input bool Smart_Tuning_Enabled = false;  // Enable Smart Tuning
 
 // --- External Adjustable Parameters (Inputs) ---
 input int Inp_Scan_Range = 500;           // History Scan Range
-int Scan_Range = Inp_Scan_Range;
 
 // --- Bullish K-Target (Bottom) Anchor Parameters ---
 input int Inp_Lookahead_Bottom = 20;      // Bull: Right Check
-int Lookahead_Bottom = Inp_Lookahead_Bottom;
 input int Inp_Lookback_Bottom = 20;       // Bull: Left Check
-int Lookback_Bottom = Inp_Lookback_Bottom;
 
 // --- Bearish K-Target (Top) Anchor Parameters ---
 input int Inp_Lookahead_Top = 20;         // Bear: Right Check
-int Lookahead_Top = Inp_Lookahead_Top;
 input int Inp_Lookback_Top = 20;          // Bear: Left Check
-int Lookback_Top = Inp_Lookback_Top;
 
 // --- Signal Confirmation Parameters ---
 input int Inp_Max_Signal_Lookforward = 20; // Signal Confirm Range
-int Max_Signal_Lookforward = Inp_Max_Signal_Lookforward;
 input int DB_Threshold_Candles = 3;       // DB Min Bars (>=3)
 input int Inp_Look_LLHH_Candles = 5;       // Abs. High/Low Scan
-int Look_LLHH_Candles = Inp_Look_LLHH_Candles;
 input bool Enable_IB_Signal_Marking = false; // Mark/Alert IB-only signals (no CB)
 
 input string  __Anchor_Honest_Filter_Settings__   = "=== Anchor point and Honest Filter Settings ===";
 input int Inp_Find_Target_Model = 1;         // Anchor point lookup method. Search Mode (1=Std, 2=Strict)
-int Find_Target_Model = Inp_Find_Target_Model;
 input bool Inp_Enable_Honest_Filter = false; // Enable Honest Filter Mode (Needs Right-side Confirm)
-bool Enable_Honest_Filter = Inp_Enable_Honest_Filter;
 
 input bool Inp_Use_Enhanced_P2_Search = false; // P2 Search Algorithm (false=Standard, true=Enhanced)
-bool Use_Enhanced_P2_Search = Inp_Use_Enhanced_P2_Search;
 // (false=Standard, true=Enhanced with Bar/Price Distance Constraints)
 
 input int Enhanced_P2_Min_Bars_Between = 2;  // Min K-line Gap for Enhanced P2 (0=No Limit, 2=Filter Noise)
 
 input bool Inp_Use_Strict_PLevel_Search = false; // P3/P4/P5 Search Mode (false=Standard, true=Strict)
-bool Use_Strict_PLevel_Search = Inp_Use_Strict_PLevel_Search;
 // P3/P4/P5 Search Mode (false=Standard, true=Strict Body Separation)
 
 input int Inp_Strict_PLevel_Min_Bars_Between = 0; // Min K-line Gap for Strict P-Level (0=No Limit, 2=Filter Noise)
-int Strict_PLevel_Min_Bars_Between = Inp_Strict_PLevel_Min_Bars_Between;
 input string  __Anchor_Honest_Filter_Settings__End__   = "=== Anchor point and Honest Filter Settings End ===";
+
+//#region MARK: 模块--输入参数运行时变量集中管理
+int Scan_Range = Inp_Scan_Range;
+int Lookahead_Bottom = Inp_Lookahead_Bottom;
+int Lookback_Bottom = Inp_Lookback_Bottom;
+int Lookahead_Top = Inp_Lookahead_Top;
+int Lookback_Top = Inp_Lookback_Top;
+int Max_Signal_Lookforward = Inp_Max_Signal_Lookforward;
+int Look_LLHH_Candles = Inp_Look_LLHH_Candles;
+int Find_Target_Model = Inp_Find_Target_Model;
+bool Enable_Honest_Filter = Inp_Enable_Honest_Filter;
+bool Use_Enhanced_P2_Search = Inp_Use_Enhanced_P2_Search;
+bool Use_Strict_PLevel_Search = Inp_Use_Strict_PLevel_Search;
+int Strict_PLevel_Min_Bars_Between = Inp_Strict_PLevel_Min_Bars_Between;
+//#endregion
 
 // 严格模式快捷按钮的运行状态枚举：标准、严格、严格+Honest。
 enum StrictQuickMode
