@@ -1590,7 +1590,7 @@ void DrawSingleSession_V2(datetime day_base, string name, int start_h_gmt, int e
 
    double high_price = High[highest_idx];
    double low_price  = Low[lowest_idx];
-    double padding = 20 * _Point;
+   double padding = 20 * _Point;
 
    // 5. 绘制矩形 (强制属性重设)
    if(ObjectFind(0, obj_name) != -1) ObjectDelete(0, obj_name);
@@ -1658,7 +1658,7 @@ void DrawSingleSession(datetime day_base, string name, int start_h_gmt, int end_
 
    double high_price = High[highest_idx];
    double low_price  = Low[lowest_idx];
-    double padding = 20 * _Point;
+   double padding = 20 * _Point;
 
    // 4. 绘制矩形
    if(ObjectFind(0, obj_name) != -1) ObjectDelete(0, obj_name);
