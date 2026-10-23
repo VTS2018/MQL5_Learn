@@ -134,6 +134,7 @@ void DrawP1Baseline(int target_index, int breakout_index, bool is_bullish, doubl
     // [V1.22 UPD] 设置注释/描述，包含 IB/DB 分类和 P2 价格
     comment = classification + " P1 @" + DoubleToString(price1, Digits) + " (P2:" + DoubleToString(P2_price, Digits) + ")";
     ObjectSetString(0, name, OBJPROP_TEXT, comment);
+    ObjectSetString(0, name, OBJPROP_TOOLTIP, comment);
     
     // 将趋势线设置为不可选中
     ObjectSetInteger(0, name, OBJPROP_SELECTABLE, false);
@@ -201,6 +202,7 @@ void DrawP2Baseline(int target_index, int breakout_index, bool is_bullish)
     
     comment = "P2 Baseline" + " (P2:" + DoubleToString(P2_price, Digits) + ")";
     ObjectSetString(0, name, OBJPROP_TEXT, comment);
+    ObjectSetString(0, name, OBJPROP_TOOLTIP, comment);
     ObjectSetInteger(0, name, OBJPROP_SELECTABLE, false);
     
     // === 【NEW】控制对象列表可见性 ===
@@ -245,10 +247,13 @@ void DrawPnBaseline(int start_index, int end_index, int level, double price, boo
             line_style = STYLE_DASHDOT;
             line_width = 1;
             break;
-        case 5:  // P5 - 绿色双点划线（较粗）
+        case 5:  // P5 - 绿色细实线
             line_color = is_bullish ? clrLime : clrGreen;
-            line_style = STYLE_DASHDOTDOT;
-            line_width = 2;
+            // 原P5样式：双点划线、较粗
+            // line_style = STYLE_DASHDOTDOT;
+            // line_width = 2;
+            line_style = STYLE_SOLID;
+            line_width = 1;
             break;
         default:
             line_color = clrGray;
@@ -289,6 +294,7 @@ void DrawPnBaseline(int start_index, int end_index, int level, double price, boo
     
     string comment = "P" + IntegerToString(level) + " Level (" + DoubleToString(price, Digits) + ")";
     ObjectSetString(0, name, OBJPROP_TEXT, comment);
+    ObjectSetString(0, name, OBJPROP_TOOLTIP, comment);
     
     // 控制对象列表可见性
     if (Hide_Auxiliary_In_List)
@@ -350,6 +356,7 @@ void DrawAbsoluteSupportLine(int abs_index, bool is_bullish, int extend_bars)
     // 设置文字说明 (可见文本)
     string comment = is_bullish ? "Absolute Low Support" : "Absolute High Resistance";
     ObjectSetString(0, name, OBJPROP_TEXT, comment);
+    ObjectSetString(0, name, OBJPROP_TOOLTIP, comment);
 
     // **确保文字可见性**：将文字附加在趋势线的一端，并调整其位置。
     // 在 MQL4 中，OBJ_TREND 的 OBJPROP_TEXT 默认是可见的，我们只需要确保它没有被其他东西遮挡。
@@ -473,6 +480,7 @@ void DrawP1P2Rectangle(int target_index, int P2_index, bool is_bullish)
     //ObjectSetInteger(0, name, OBJPROP_LEVEL, 120); // 透明度设置 (例如 120)
     
     ObjectSetString(0, name, OBJPROP_TEXT, "P1/P2 Area");
+    ObjectSetString(0, name, OBJPROP_TOOLTIP, "P1/P2 Area");
     ObjectSetInteger(0, name, OBJPROP_SELECTABLE, false); // 不可选中
     
     // 3. 更新矩形位置 (用于 OnCalculate 循环更新)
@@ -620,6 +628,7 @@ void DrawP1P2Fibonacci(int target_index, int P2_index, bool is_bullish)
     
     string time_p = GetTimeframeName(_Period);
     ObjectSetString(0, name, OBJPROP_TEXT, "P1/P2 Fibo " + time_p + (is_bullish ? " 多 " : " 空 "));
+    ObjectSetString(0, name, OBJPROP_TOOLTIP, "P1/P2 Fibo " + time_p + (is_bullish ? " 多 " : " 空 "));
 
     // 🚨 V1.48 关键修正: 显式设置斐波那契级别总数
     ObjectSetInteger(0, name, OBJPROP_LEVELS, FIBO_CUSTOM_LEVELS_COUNT);
@@ -906,8 +915,9 @@ void ExecuteDrawFiboRects(int target_index, int P2_index, bool is_bullish, const
                 ObjectSetInteger(0, name, OBJPROP_TIMEFRAMES, OBJ_ALL_PERIODS);
 
             // ObjectSetInteger(0, name, OBJPROP_TIMEFRAMES, OBJ_ALL_PERIODS);
-            // 🚨 核心修正：设置 OBJPROP_TEXT 作为对象列表的“说明” 🚨
+            // 🚨 核心修正：设置对象说明及鼠标悬停提示 🚨
             ObjectSetString(0, name, OBJPROP_TEXT, description_text);
+            ObjectSetString(0, name, OBJPROP_TOOLTIP, description_text);
 
             string description_text_level = description_text + " " + DoubleToString(level1, 3);
 
