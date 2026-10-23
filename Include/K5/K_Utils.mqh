@@ -168,51 +168,113 @@ bool ParseRectangleName_v1(const string rect_name, ParsedRectInfo &info)
 }
 */
 
-//+------------------------------------------------------------------+
-//| 辅助函数，将 _Period 的分钟数转换为 MT4 期望的位标志 9个默认周期
-//+------------------------------------------------------------------+
+//#region MARK: 模块--MQL5周期可见性标志转换
+/*
+// MQL4旧版本：_Period使用分钟数，返回旧版9个周期的位标志。
 int GetTimeframeFlag(int timeframe_period)
 {
-    // MQL4 中 _Period 返回的值是分钟数
-    if (timeframe_period == 1)      return(1);       // M1
-    if (timeframe_period == 5)      return(2);       // M5
-    if (timeframe_period == 15)     return(4);       // M15
-    if (timeframe_period == 30)     return(8);       // M30
-    if (timeframe_period == 60)     return(16);      // H1
-    if (timeframe_period == 240)    return(32);      // H4
-    
-    // 🚨 核心修正：避免使用 43200 这种数值作为位标志 🚨
-    if (timeframe_period == 1440)   return(64);      // D1
-    if (timeframe_period == 10080)  return(128);     // W1
-    if (timeframe_period == 43200)  return(256);     // MN1 (月线)
-    
-    // 如果是自定义周期或其他未知周期，返回 0 (表示所有周期可见或不设置)
-    return(0); 
+    if (timeframe_period == 1)      return(1);
+    if (timeframe_period == 5)      return(2);
+    if (timeframe_period == 15)     return(4);
+    if (timeframe_period == 30)     return(8);
+    if (timeframe_period == 60)     return(16);
+    if (timeframe_period == 240)    return(32);
+    if (timeframe_period == 1440)   return(64);
+    if (timeframe_period == 10080)  return(128);
+    if (timeframe_period == 43200)  return(256);
+    return(0);
 }
+*/
 
 /**
- * 将 _Period 的分钟数值转换为对应的周期名称字符串 (例如 M1, H4, MN1)。
- * @param timeframe_period: _Period 的整数值 (例如 1, 60, 43200)。
- * @return 对应的周期名称字符串。
+ * 将 MQL5 的 ENUM_TIMEFRAMES 周期转换为对象可见性标志。
+ * @param timeframe_period: MQL5 周期值，例如 PERIOD_H4。
+ * @return 对应的 OBJ_PERIOD_* 标志；未知周期返回 0。
  */
+int GetTimeframeFlag(int timeframe_period)
+{
+    switch((ENUM_TIMEFRAMES)timeframe_period)
+    {
+        case PERIOD_M1:  return(OBJ_PERIOD_M1);
+        case PERIOD_M2:  return(OBJ_PERIOD_M2);
+        case PERIOD_M3:  return(OBJ_PERIOD_M3);
+        case PERIOD_M4:  return(OBJ_PERIOD_M4);
+        case PERIOD_M5:  return(OBJ_PERIOD_M5);
+        case PERIOD_M6:  return(OBJ_PERIOD_M6);
+        case PERIOD_M10: return(OBJ_PERIOD_M10);
+        case PERIOD_M12: return(OBJ_PERIOD_M12);
+        case PERIOD_M15: return(OBJ_PERIOD_M15);
+        case PERIOD_M20: return(OBJ_PERIOD_M20);
+        case PERIOD_M30: return(OBJ_PERIOD_M30);
+        case PERIOD_H1:  return(OBJ_PERIOD_H1);
+        case PERIOD_H2:  return(OBJ_PERIOD_H2);
+        case PERIOD_H3:  return(OBJ_PERIOD_H3);
+        case PERIOD_H4:  return(OBJ_PERIOD_H4);
+        case PERIOD_H6:  return(OBJ_PERIOD_H6);
+        case PERIOD_H8:  return(OBJ_PERIOD_H8);
+        case PERIOD_H12: return(OBJ_PERIOD_H12);
+        case PERIOD_D1:  return(OBJ_PERIOD_D1);
+        case PERIOD_W1:  return(OBJ_PERIOD_W1);
+        case PERIOD_MN1: return(OBJ_PERIOD_MN1);
+    }
+
+    return(0);
+}
+//#endregion
+
+//#region MARK: 模块--MQL5周期名称转换
+/*
+// MQL4旧版本：_Period使用分钟数表示周期。
 string GetTimeframeName(int timeframe_period)
 {
-    // MQL4 中 _Period 返回的值是分钟数
     if (timeframe_period == 1)      return("M1");
     if (timeframe_period == 5)      return("M5");
     if (timeframe_period == 15)     return("M15");
     if (timeframe_period == 30)     return("M30");
     if (timeframe_period == 60)     return("H1");
     if (timeframe_period == 240)    return("H4");
-    
-    // 日线、周线、月线 (使用它们的分钟数进行匹配)
     if (timeframe_period == 1440)   return("D1");
     if (timeframe_period == 10080)  return("W1");
-    if (timeframe_period == 43200)  return("MN1"); // 月线
-    
-    // 如果是自定义周期或无法识别的周期
-    return("Custom/Unknown"); 
+    if (timeframe_period == 43200)  return("MN1");
+    return("Custom/Unknown");
 }
+*/
+
+/**
+ * 将 MQL5 的 ENUM_TIMEFRAMES 周期转换为周期名称。
+ * @param timeframe_period: MQL5 周期值，例如 PERIOD_H4。
+ * @return 对应的周期名称字符串。
+ */
+string GetTimeframeName(int timeframe_period)
+{
+    switch((ENUM_TIMEFRAMES)timeframe_period)
+    {
+        case PERIOD_M1:  return("M1");
+        case PERIOD_M2:  return("M2");
+        case PERIOD_M3:  return("M3");
+        case PERIOD_M4:  return("M4");
+        case PERIOD_M5:  return("M5");
+        case PERIOD_M6:  return("M6");
+        case PERIOD_M10: return("M10");
+        case PERIOD_M12: return("M12");
+        case PERIOD_M15: return("M15");
+        case PERIOD_M20: return("M20");
+        case PERIOD_M30: return("M30");
+        case PERIOD_H1:  return("H1");
+        case PERIOD_H2:  return("H2");
+        case PERIOD_H3:  return("H3");
+        case PERIOD_H4:  return("H4");
+        case PERIOD_H6:  return("H6");
+        case PERIOD_H8:  return("H8");
+        case PERIOD_H12: return("H12");
+        case PERIOD_D1:  return("D1");
+        case PERIOD_W1:  return("W1");
+        case PERIOD_MN1: return("MN1");
+    }
+
+    return("Custom/Unknown");
+}
+//#endregion
 
 /**
  * 辅助函数：计算斐波那契水平线的价格
