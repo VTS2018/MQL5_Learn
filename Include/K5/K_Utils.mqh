@@ -62,7 +62,7 @@ string GetBarTimeID_v1(int bar_index)
     // --- 1. 确定目标时间 ---
     
     // 检查索引是否有效。如果索引无效 (例如 < 0)，则使用当前服务器时间。
-    if (bar_index < 0 || bar_index >= Bars)
+    if (bar_index < 0 || bar_index >= iBars(_Symbol, _Period))
     {
         target_time = TimeCurrent();
         // Print("DEBUG: GetBarTimeID used TimeCurrent() due to invalid index: ", bar_index);
@@ -70,7 +70,7 @@ string GetBarTimeID_v1(int bar_index)
     else
     {
         // 索引有效，使用 K 线的开盘时间
-        target_time = Time[bar_index];
+        target_time = iTime(_Symbol, _Period, bar_index);
     }
     
     // --- 2. 将 datetime 转换为结构体，方便格式化 ---
@@ -325,7 +325,7 @@ string GetBarTimeID(int bar_index)
     // --- 1. 确定目标时间 ---
     
     // 检查索引是否有效。如果索引无效 (例如 < 0)，则使用当前服务器时间。
-    if (bar_index < 0 || bar_index >= Bars)
+    if (bar_index < 0 || bar_index >= iBars(_Symbol, _Period))
     {
         target_time = TimeCurrent();
         // Print("DEBUG: GetBarTimeID used TimeCurrent() due to invalid index: ", bar_index);
@@ -333,7 +333,7 @@ string GetBarTimeID(int bar_index)
     else
     {
         // 索引有效，使用 K 线的开盘时间
-        target_time = Time[bar_index];
+        target_time = iTime(_Symbol, _Period, bar_index);
     }
     
     // --- 2. 将 datetime 转换为结构体，方便格式化 ---
