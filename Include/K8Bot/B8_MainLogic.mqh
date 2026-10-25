@@ -724,7 +724,9 @@ void B8_ExecuteTrade(const KBarSignal &signal, int type)
     */
 
     // 2.1 计算信号止损距离（参考价使用K[1]收盘价，便于信号标准化）
-    double signal_close = Close[1];
+    // [旧代码保留] double signal_close = Close[1];
+    // 新代码：Close[] 的 Series 方向在当前 EA 中未被可靠保证，直接按 shift 读取已收盘 K 线。
+    double signal_close = B8_GetClosedBarClose();
     double sl_price_diff = (type == OP_BUY)
                            ? (signal_close - sl_price)
                            : (sl_price - signal_close);
@@ -1174,7 +1176,9 @@ void B8_CreatePendingPlansV3(const KBarSignal &signal, int type)
 {
     double fib0 = (type == OP_BUY) ? signal.BullishStopLossPrice
                                    : signal.BearishStopLossPrice;
-    double fib1 = Close[1];
+    // [旧代码保留] double fib1 = Close[1];
+    // 新代码：Fibo 的基准价必须与 MT7 的 shift=1 信号使用同一根已收盘 K 线。
+    double fib1 = B8_GetClosedBarClose();
     string group_key = B8_PendingGroupKey(signal, type);
     double levels[8] = {0.120, 0.214, 0.236, 0.382, 0.500, 0.618, 0.786, 0.880};
     bool created_any = false;
@@ -1358,7 +1362,9 @@ void B8_CreatePendingPlansV2(const KBarSignal &signal, int type)
 {
     double fib0 = (type == OP_BUY) ? signal.BullishStopLossPrice
                                    : signal.BearishStopLossPrice;
-    double fib1 = Close[1];
+    // [旧代码保留] double fib1 = Close[1];
+    // 新代码：Fibo 的基准价必须与 MT7 的 shift=1 信号使用同一根已收盘 K 线。
+    double fib1 = B8_GetClosedBarClose();
     string group_key = B8_PendingGroupKey(signal, type);
     double levels[8] = {0.120, 0.214, 0.236, 0.382, 0.500, 0.618, 0.786, 0.880};
     bool created_any = false;

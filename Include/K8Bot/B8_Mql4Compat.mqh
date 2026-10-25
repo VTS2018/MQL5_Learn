@@ -32,6 +32,36 @@ bool g_B8_SelectedHistory = false;
 datetime B8_Time[];
 double B8_Close[];
 
+//#region MARK: 模块--统一读取 Series K 线数据
+// 新增：直接按 shift 读取 MT5 时间序列，避免依赖 EA 中 Time[]/Close[] 的数组方向。
+datetime B8_GetBarTime(int shift)
+{
+    if (shift < 0) return 0;
+    return iTime(_Symbol, _Period, shift);
+}
+
+double B8_GetBarClose(int shift)
+{
+    if (shift < 0) return 0.0;
+    return iClose(_Symbol, _Period, shift);
+}
+
+datetime B8_GetCurrentBarTime()
+{
+    return B8_GetBarTime(0);
+}
+
+datetime B8_GetClosedBarTime()
+{
+    return B8_GetBarTime(1);
+}
+
+double B8_GetClosedBarClose()
+{
+    return B8_GetBarClose(1);
+}
+//#endregion
+
 int B8_OrdersTotal()
 {
     return PositionsTotal() + ::OrdersTotal();

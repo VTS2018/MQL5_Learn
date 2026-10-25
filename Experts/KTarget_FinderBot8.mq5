@@ -767,23 +767,29 @@ void OnTick()
     {
         // 请求只消费一次。即使没有信号或订单被风控拒绝，也不在后续 Tick 重复尝试。
         g_manual_recheck_pending = false;
-        g_manual_recheck_bar_time = Time[0];
+        // [旧代码保留] g_manual_recheck_bar_time = Time[0];
+        g_manual_recheck_bar_time = B8_GetCurrentBarTime();
     }
     else
     {
         // 正常路径：每根当前 K 线只处理一次。
         // 如果本根 K 线刚刚完成过手动补检，则不再由正常入口重复处理。
-        if (Time[0] == g_manual_recheck_bar_time) return;
-        if (Time[0] == g_last_bar_time) return;
-        g_last_bar_time = Time[0];
+        // [旧代码保留] if (Time[0] == g_manual_recheck_bar_time) return;
+        if (B8_GetCurrentBarTime() == g_manual_recheck_bar_time) return;
+        // [旧代码保留] if (Time[0] == g_last_bar_time) return;
+        if (B8_GetCurrentBarTime() == g_last_bar_time) return;
+        // [旧代码保留] g_last_bar_time = Time[0];
+        g_last_bar_time = B8_GetCurrentBarTime();
     }
 
     // 仅记录本次信号检查的入口来源，便于实盘区分正常扫描和手动补检。
     // 日志放在入口分流之后，不参与任何交易判断，也不改变后续执行顺序。
     Print("[Bot8][信号检查入口] 类型:",
           (is_manual_recheck ? "手动开启后的补检" : "正常新K线扫描"),
-          " K[0]:", TimeToString(Time[0], TIME_DATE | TIME_MINUTES),
-          " K[1]:", TimeToString(Time[1], TIME_DATE | TIME_MINUTES));
+          // [旧代码保留] " K[0]:", TimeToString(Time[0], TIME_DATE | TIME_MINUTES),
+          " K[0]:", TimeToString(B8_GetCurrentBarTime(), TIME_DATE | TIME_MINUTES),
+          // [旧代码保留] " K[1]:", TimeToString(Time[1], TIME_DATE | TIME_MINUTES));
+          " K[1]:", TimeToString(B8_GetClosedBarTime(), TIME_DATE | TIME_MINUTES));
 
     // 纯市价模式保留原有前置持仓上限检查；挂单模式不在此处阻断信号。
     if (g_Runtime_Entry_Mode == B8_ENTRY_MARKET &&
@@ -810,7 +816,8 @@ void OnTick()
     if (g_Trade_Mode == B8_MODE_NORMAL && has_bull && has_bear)
     {
         Print("[Bot8][普通模式] K[1] 多空信号同时出现，本轮不交易。"
-              "时间: ", TimeToString(Time[1]),
+              // [旧代码保留] "时间: ", TimeToString(Time[1]),
+              "时间: ", TimeToString(B8_GetClosedBarTime()),
               " 看涨SL=", DoubleToString(signal.BullishStopLossPrice, _Digits),
               " 看跌SL=", DoubleToString(signal.BearishStopLossPrice, _Digits));
         return;
@@ -823,7 +830,8 @@ void OnTick()
         case B8_MODE_NORMAL:
             if (has_bull)
             {
-                Print("[Bot8][普通模式] 看涨信号 K[1]=", TimeToString(Time[1]),
+                // [旧代码保留] Print("[Bot8][普通模式] 看涨信号 K[1]=", TimeToString(Time[1]),
+                Print("[Bot8][普通模式] 看涨信号 K[1]=", TimeToString(B8_GetClosedBarTime()),
                       " SL=", DoubleToString(signal.BullishStopLossPrice, _Digits));
                 if (g_Runtime_Entry_Mode != B8_ENTRY_PENDING)
                     B8_ExecuteTrade(signal, OP_BUY);
@@ -832,7 +840,8 @@ void OnTick()
             }
             else if (has_bear)
             {
-                Print("[Bot8][普通模式] 看跌信号 K[1]=", TimeToString(Time[1]),
+                // [旧代码保留] Print("[Bot8][普通模式] 看跌信号 K[1]=", TimeToString(Time[1]),
+                Print("[Bot8][普通模式] 看跌信号 K[1]=", TimeToString(B8_GetClosedBarTime()),
                       " SL=", DoubleToString(signal.BearishStopLossPrice, _Digits));
                 if (g_Runtime_Entry_Mode != B8_ENTRY_PENDING)
                     B8_ExecuteTrade(signal, OP_SELL);
@@ -845,7 +854,8 @@ void OnTick()
         case B8_MODE_BUY_ONLY:
             if (has_bull)
             {
-                Print("[Bot8][只多模式] 看涨信号 K[1]=", TimeToString(Time[1]),
+                // [旧代码保留] Print("[Bot8][只多模式] 看涨信号 K[1]=", TimeToString(Time[1]),
+                Print("[Bot8][只多模式] 看涨信号 K[1]=", TimeToString(B8_GetClosedBarTime()),
                       " SL=", DoubleToString(signal.BullishStopLossPrice, _Digits));
                 if (g_Runtime_Entry_Mode != B8_ENTRY_PENDING)
                     B8_ExecuteTrade(signal, OP_BUY);
@@ -855,7 +865,8 @@ void OnTick()
             else
             {
                 Print("[Bot8][只多模式] K[1] 为看跌信号，已被过滤，不执行。"
-                      "时间: ", TimeToString(Time[1]));
+                      // [旧代码保留] "时间: ", TimeToString(Time[1]));
+                      "时间: ", TimeToString(B8_GetClosedBarTime()));
             }
             break;
 
@@ -863,7 +874,8 @@ void OnTick()
         case B8_MODE_SELL_ONLY:
             if (has_bear)
             {
-                Print("[Bot8][只空模式] 看跌信号 K[1]=", TimeToString(Time[1]),
+                // [旧代码保留] Print("[Bot8][只空模式] 看跌信号 K[1]=", TimeToString(Time[1]),
+                Print("[Bot8][只空模式] 看跌信号 K[1]=", TimeToString(B8_GetClosedBarTime()),
                       " SL=", DoubleToString(signal.BearishStopLossPrice, _Digits));
                 if (g_Runtime_Entry_Mode != B8_ENTRY_PENDING)
                     B8_ExecuteTrade(signal, OP_SELL);
@@ -873,7 +885,8 @@ void OnTick()
             else
             {
                 Print("[Bot8][只空模式] K[1] 为看涨信号，已被过滤，不执行。"
-                      "时间: ", TimeToString(Time[1]));
+                      // [旧代码保留] "时间: ", TimeToString(Time[1]));
+                      "时间: ", TimeToString(B8_GetClosedBarTime()));
             }
             break;
 
@@ -1121,7 +1134,9 @@ void OnChartEvent(const int id,
         // 仅在“关闭 -> 开启”的瞬间安排一次补检。
         // 不清零 g_last_bar_time：正常的新 K 线捕获机制必须保持原有语义。
         // 关闭后清除尚未执行的手动补检请求，避免重新开启时误触发旧请求。
-        if (!was_enabled && g_EA_Enabled && g_manual_recheck_bar_time != Time[0])
+        // [旧代码保留] if (!was_enabled && g_EA_Enabled && g_manual_recheck_bar_time != Time[0])
+        if (!was_enabled && g_EA_Enabled &&
+            g_manual_recheck_bar_time != B8_GetCurrentBarTime())
             g_manual_recheck_pending = true;
         // 仅处理“已开启 -> 已关闭”的状态切换。
         else if (was_enabled && !g_EA_Enabled)
