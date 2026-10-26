@@ -35,35 +35,87 @@
 //            + item;
 // }
 
-// [新增] 状态键使用完整品种名，并检查MQL4全局变量名称长度。
+// [旧代码保留] 状态键使用完整品种名，并检查MQL4全局变量名称长度。
+// string B8_BuildStateKey(string item)
+// {
+//     string account_text = IntegerToString(AccountNumber());
+//     int account_length = StringLen(account_text);
+//     int account_start = MathMax(0, account_length - 4);
+//     string account_suffix = StringSubstr(account_text, account_start);
+//     int chart_id_mod = (int)(MathAbs(ChartID()) % 1000000);
+//
+//     string state_key = "B8S2|"
+//                        + account_suffix + "|"
+//                        + _Symbol + "|"
+//                        + IntegerToString(MagicNumber) + "|"
+//                        + IntegerToString(chart_id_mod) + "|"
+//                        + item;
+//     int state_key_length = StringLen(state_key);
+//
+//     // Print("[Bot8][全局变量键长度] symbol=", _Symbol,
+//     //       " item=", item,
+//     //       " length=", state_key_length,
+//     //       "/63 key=", state_key);
+//     if (state_key_length > 63)
+//         Print("[Bot8][全局变量键超长] symbol=", _Symbol,
+//               " item=", item,
+//               " length=", state_key_length,
+//               ", MQL4限制=63");
+//
+//     return state_key;
+// }
+
+//#region MARK: 模块--新增代码集中说明
+// 仅移除品种名末尾的 .cash，其他品种名保持原样。
+string B8_GetStateKeySymbol()
+{
+    string state_symbol = _Symbol;
+    string cash_suffix = ".cash";
+    int suffix_length = StringLen(cash_suffix);
+    int symbol_length = StringLen(state_symbol);
+
+    if (symbol_length > suffix_length &&
+        StringFind(state_symbol, cash_suffix, symbol_length - suffix_length) ==
+            symbol_length - suffix_length)
+    {
+        state_symbol = StringSubstr(state_symbol, 0, symbol_length - suffix_length);
+    }
+
+    return state_symbol;
+}
+
+// [新增] 状态键使用去除末尾.cash后的品种名，并检查MQL4全局变量名称长度。
 string B8_BuildStateKey(string item)
 {
     string account_text = IntegerToString(AccountNumber());
     int account_length = StringLen(account_text);
     int account_start = MathMax(0, account_length - 4);
     string account_suffix = StringSubstr(account_text, account_start);
+    string state_symbol = B8_GetStateKeySymbol();
     int chart_id_mod = (int)(MathAbs(ChartID()) % 1000000);
 
     string state_key = "B8S2|"
                        + account_suffix + "|"
-                       + _Symbol + "|"
+                       + state_symbol + "|"
                        + IntegerToString(MagicNumber) + "|"
                        + IntegerToString(chart_id_mod) + "|"
                        + item;
     int state_key_length = StringLen(state_key);
 
-    // Print("[Bot8][全局变量键长度] symbol=", _Symbol,
+    // Print("[Bot8][全局变量键长度] symbol=", state_symbol,
     //       " item=", item,
     //       " length=", state_key_length,
     //       "/63 key=", state_key);
     if (state_key_length > 63)
-        Print("[Bot8][全局变量键超长] symbol=", _Symbol,
+        Print("[Bot8][全局变量键超长] symbol=", state_symbol,
               " item=", item,
               " length=", state_key_length,
               ", MQL4限制=63");
 
     return state_key;
 }
+//#endregion
+
 //#endregion
 
 //#region MARK: 模块--订单身份唯一Magic模块
