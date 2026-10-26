@@ -128,7 +128,7 @@ void B8_ManageEquityProtection()
             if (close_type != OP_BUY && close_type != OP_SELL) continue;
 
             found_market_order = true;
-            int close_ticket = OrderTicket();
+            ulong close_ticket = OrderTicket();
             double close_lots = OrderLots();
             RefreshRates();
             double close_price = (close_type == OP_BUY) ? Bid : Ask;
@@ -182,7 +182,7 @@ void B8_ManageEquityProtection()
         int type = OrderType();
         if (type != OP_BUY && type != OP_SELL) continue;
 
-        int ticket = OrderTicket();
+        ulong ticket = OrderTicket();
 
         // 关键顺序调整：先尝试保本，再判断减仓是否可行。
         // 这样即使剩余手数太小无法减仓，也不会错过保本动作。
@@ -329,7 +329,7 @@ void B8_ManageEquityProtectionV2()
             if (close_type != OP_BUY && close_type != OP_SELL) continue;
 
             found_market_order = true;
-            int close_ticket = OrderTicket();
+            ulong close_ticket = OrderTicket();
             double close_lots = OrderLots();
             RefreshRates();
             double close_price = (close_type == OP_BUY) ? Bid : Ask;
@@ -384,7 +384,7 @@ void B8_ManageEquityProtectionV2()
         if (type != OP_BUY && type != OP_SELL) continue;
 
         found_order = true;
-        int ticket = OrderTicket();
+        ulong ticket = OrderTicket();
         bool be_done = !Move_SL_To_BE;
 
         if (Move_SL_To_BE)
@@ -550,7 +550,7 @@ void B8_ManageOrderProtection()
         int type = OrderType();
         if (type != OP_BUY && type != OP_SELL) continue;
 
-        int ticket = OrderTicket();
+        ulong ticket = OrderTicket();
         int order_magic = OrderMagicNumber();
         double open_price = OrderOpenPrice();
         double current_sl = OrderStopLoss();
@@ -879,17 +879,17 @@ void B8_ExecuteTrade(const KBarSignal &signal, int type)
     }
 
     // 6. 发送订单
-    int ticket = OrderSend(_Symbol,
-                           type,
-                           trade_lots,
-                           open_price,
-                           Slippage,
-                           order_sl_price,
-                           tp_price,
-                           comment,
-                           order_magic,
-                           0,
-                           (type == OP_BUY) ? clrGreen : clrRed);
+    ulong ticket = OrderSend(_Symbol,
+                             type,
+                             trade_lots,
+                             open_price,
+                             Slippage,
+                             order_sl_price,
+                             tp_price,
+                             comment,
+                             order_magic,
+                             0,
+                             (type == OP_BUY) ? clrGreen : clrRed);
 
     if (ticket > 0)
     {
@@ -1125,17 +1125,17 @@ void B8_ExecutePendingTrade(const KBarSignal &signal, int type,
     int send_order_type = (override_pending_type != OP_NONE)
                           ? override_pending_type
                           : ((type == OP_BUY) ? OP_BUYLIMIT : OP_SELLLIMIT);
-    int ticket = OrderSend(_Symbol,
-                           send_order_type,
-                           trade_lots,
-                           open_price,
-                           Slippage,
-                           order_sl_price,
-                           tp_price,
-                           comment,
-                           order_magic,
-                           0,
-                           (type == OP_BUY) ? clrGreen : clrRed);
+    ulong ticket = OrderSend(_Symbol,
+                             send_order_type,
+                             trade_lots,
+                             open_price,
+                             Slippage,
+                             order_sl_price,
+                             tp_price,
+                             comment,
+                             order_magic,
+                             0,
+                             (type == OP_BUY) ? clrGreen : clrRed);
 
     if (ticket > 0)
     {
@@ -2308,7 +2308,7 @@ void B8_MarkPartialCloseBlocked(int logical_magic)
 //====================================================================
 // 订单级保护：移动到订单自身的保本价
 //====================================================================
-bool B8_MoveOrderToBreakeven(int ticket, int type, double open_price)
+bool B8_MoveOrderToBreakeven(ulong ticket, int type, double open_price)
 {
     if (!OrderSelect(ticket, SELECT_BY_TICKET, MODE_TRADES)) return false;
 
@@ -2350,7 +2350,7 @@ bool B8_MoveOrderToBreakeven(int ticket, int type, double open_price)
 //====================================================================
 // 订单级保护：按交易商手数规则执行一次部分平仓
 //====================================================================
-bool B8_CloseOrderPartially(int ticket, int logical_magic, int type, double close_percent)
+bool B8_CloseOrderPartially(ulong ticket, int logical_magic, int type, double close_percent)
 {
     if (!OrderSelect(ticket, SELECT_BY_TICKET, MODE_TRADES)) return false;
 
@@ -2400,7 +2400,7 @@ bool B8_CloseOrderPartially(int ticket, int logical_magic, int type, double clos
 // 订单级保护：全部平仓
 // 达到订单保护触发条件后直接关闭全部手数，不复用部分平仓逻辑。
 //====================================================================
-bool B8_CloseOrderFully(int ticket, int type)
+bool B8_CloseOrderFully(ulong ticket, int type)
 {
     if (!OrderSelect(ticket, SELECT_BY_TICKET, MODE_TRADES)) return false;
 
@@ -2544,7 +2544,7 @@ void B8_CleanupRuntimeTakeoverStates()
 
 //#region MARK: 模块--新增实现：运行时订单一键保本
 // 返回值：1=已移动，0=原止损已处于保本或更优，-1=执行失败。
-int B8_ManualMoveRuntimeOrderToBreakeven(int ticket, int be_buffer_points)
+int B8_ManualMoveRuntimeOrderToBreakeven(ulong ticket, int be_buffer_points)
 {
     if (!B8_SelectRuntimeOrderByTicket(ticket)) return -1;
 
@@ -2601,7 +2601,7 @@ bool B8_ExecuteRuntimeBreakevenAllManaged(int &moved_count,
     if (be_value < 0.0) return false;
     int be_buffer_points = (int)MathRound(be_value);
 
-    int tickets[];
+    ulong tickets[];
     int ticket_count = 0;
     for (int i = 0; i < OrdersTotal(); i++)
     {
@@ -2815,7 +2815,7 @@ bool B8_DeleteHistoricalPendingPlans(int shift)
         if (!same_history_group) continue;
         if (StringFind(comment, B8_HISTORY_PLAN_MARKER, 0) < 0) continue;
 
-        int ticket = OrderTicket();
+        ulong ticket = OrderTicket();
         ResetLastError();
         if (!OrderDelete(ticket, clrNONE))
         {
@@ -2852,7 +2852,7 @@ void B8_TryCancelPendingGroup(const string group_key)
         if (!B8_IsPendingOrderType(OrderType())) continue;
         if (StringFind(OrderComment(), group_key, 0) < 0) continue;
 
-        int ticket = OrderTicket();
+        ulong ticket = OrderTicket();
         ResetLastError();
         if (!OrderDelete(ticket, clrNONE))
             Print("[Bot8][挂单组] 取消剩余挂单失败。 Ticket:", ticket,
@@ -3423,7 +3423,7 @@ void B8_RefreshHistoricalSignalPreview()
 
 //#region MARK: 模块--新增实现：运行时订单策略多选应用
 // 判断指定Ticket是否已经加入运行时订单的批量选择集合。
-bool B8_RuntimeOrderTicketIsSelected(int ticket)
+bool B8_RuntimeOrderTicketIsSelected(ulong ticket)
 {
     for (int i = 0; i < g_Runtime_Order_Selected_Ticket_Count; i++)
     {
@@ -3435,7 +3435,7 @@ bool B8_RuntimeOrderTicketIsSelected(int ticket)
 
 // 切换指定Ticket的批量选择状态：已选则移除，未选则加入。
 // 该集合只用于“范围:选中”模式，不改变当前正在编辑的订单。
-void B8_RuntimeOrderToggleSelectedTicket(int ticket)
+void B8_RuntimeOrderToggleSelectedTicket(ulong ticket)
 {
     if (ticket <= 0) return;
 
@@ -3515,12 +3515,12 @@ void B8_RuntimeOrderUpdateApplyScopeControl()
 // 输出运行时订单列表筛选失败原因；相同订单和相同原因每3秒最多打印一次。
 // 当前函数入口处保留提前返回，实际日志输出暂未启用。
 void B8_LogRuntimeOrderFilterMismatch(int position,
-                                      int ticket,
+                                      ulong ticket,
                                       string reason)
 {
     return;
     static uint last_log_tick = 0;
-    static int last_ticket = -1;
+    static ulong last_ticket = 0;
     static string last_reason = "";
 
     uint current_tick = GetTickCount();
@@ -3552,7 +3552,7 @@ void B8_LogRuntimeOrderFilterMismatch(int position,
 
 // 将当前编辑中的运行时策略覆盖应用到指定的一个已成交订单。
 // 策略记录按逻辑Magic保存，因此同一逻辑订单后续分单或部分平仓时仍可追踪。
-bool B8_ApplyRuntimeOrderOverrideToTicket(int ticket,
+bool B8_ApplyRuntimeOrderOverrideToTicket(ulong ticket,
                                           double trigger_value,
                                           double close_percent,
                                           int be_buffer)
@@ -3641,7 +3641,7 @@ bool B8_ApplyRuntimeOrderOverrideByScope(int &success_count,
         if (!OrderSelect(i, SELECT_BY_POS, MODE_TRADES)) continue;
         if (!B8_IsManagedOrder()) continue;
         if (OrderType() != OP_BUY && OrderType() != OP_SELL) continue;
-        int ticket = OrderTicket();
+        ulong ticket = OrderTicket();
         if (B8_ApplyRuntimeOrderOverrideToTicket(
                 ticket, trigger_value, close_percent, be_buffer))
             success_count++;
@@ -3677,7 +3677,7 @@ bool B8_HasRuntimeOrderOverride(int logical_magic)
 
 // 仅从当前持仓池按 Ticket 查找并选中当前 EA 管理的市价订单。
 // 不使用 SELECT_BY_TICKET，避免已平仓历史订单被误当作当前持仓。
-bool B8_SelectRuntimeOrderByTicket(int ticket)
+bool B8_SelectRuntimeOrderByTicket(ulong ticket)
 {
     if (ticket <= 0) return false;
 
@@ -3694,7 +3694,7 @@ bool B8_SelectRuntimeOrderByTicket(int ticket)
 }
 
 // 检查 Ticket 是否为当前品种、当前 EA 管理的已成交多单或空单。
-bool B8_RuntimeOrderIsOpen(int ticket)
+bool B8_RuntimeOrderIsOpen(ulong ticket)
 {
     return B8_SelectRuntimeOrderByTicket(ticket);
 }
@@ -3713,7 +3713,7 @@ string B8_RuntimeOrderFibCode(string comment)
 }
 
 // 根据当前价格和订单止损距离计算面板显示用的当前 R 值。
-double B8_RuntimeOrderCurrentR(int ticket)
+double B8_RuntimeOrderCurrentR(ulong ticket)
 {
     if (!B8_SelectRuntimeOrderByTicket(ticket)) return 0.0;
     int type = OrderType();
@@ -3758,7 +3758,7 @@ bool B8_TryGetCurrentOrderStopRisk(double &risk_money)
 }
 
 // 选中订单并将该订单当前策略回填到运行时订单面板。
-bool B8_RuntimeOrderSelectTicket(int ticket)
+bool B8_RuntimeOrderSelectTicket(ulong ticket)
 {
     if (!B8_SelectRuntimeOrderByTicket(ticket)) return false;
     g_Runtime_Order_Selected_Ticket = ticket;
@@ -3813,7 +3813,7 @@ bool B8_ApplyRuntimeOrderOverride()
     // 扩展开关关闭时不允许创建或修改 Runtime Override，订单继续由订单级管理接管。
     if (!g_Advanced_Order_Strategy_Enabled) return false;
 
-    int ticket = g_Runtime_Order_Selected_Ticket;
+    ulong ticket = g_Runtime_Order_Selected_Ticket;
     if (!B8_RuntimeOrderIsOpen(ticket)) return false;
     int logical_magic = OrderMagicNumber();
 
@@ -3878,7 +3878,7 @@ void B8_ClearRuntimeOrderOverride(int logical_magic)
 }
 
 // 按单笔订单的运行时覆盖执行减仓、保本或全部平仓动作。
-bool B8_ManageRuntimeOrderProtection(int ticket, int type)
+bool B8_ManageRuntimeOrderProtection(ulong ticket, int type)
 {
     if (!OrderSelect(ticket, SELECT_BY_TICKET, MODE_TRADES)) return true;
     int logical_magic = OrderMagicNumber();
@@ -4121,7 +4121,7 @@ double B8_NormalizeManualCloseLots(double lots)
 // 手动平仓模块：对指定的当前持仓执行指定手数。
 // 订单会再次校验品种和Bot8家族Magic，避免旧Ticket或外部订单被误操作。
 //+------------------------------------------------------------------+
-bool B8_CloseManualOrderLots(int ticket, double requested_lots, color close_color)
+bool B8_CloseManualOrderLots(ulong ticket, double requested_lots, color close_color)
 {
     if (!IsTradeAllowed())
     {
@@ -4195,7 +4195,7 @@ bool B8_CloseManagedManualPercent(double percent)
 {
     if (percent <= 0.0 || percent > 100.0) return false;
 
-    int tickets[];
+    ulong tickets[];
     double lots[];
     int count = 0;
     for (int i = 0; i < OrdersTotal(); i++)
@@ -4232,7 +4232,7 @@ bool B8_CloseManagedManualLots(double lots_to_close)
     if (min_lot <= 0.0) min_lot = 0.01;
     if (requested_lots < min_lot) return false;
 
-    int tickets[];
+    ulong tickets[];
     double lots[];
     int count = 0;
     for (int i = 0; i < OrdersTotal(); i++)
@@ -4257,7 +4257,7 @@ bool B8_CloseManagedManualLots(double lots_to_close)
             double temp_lots = lots[left];
             lots[left] = lots[right];
             lots[right] = temp_lots;
-            int temp_ticket = tickets[left];
+            ulong temp_ticket = tickets[left];
             tickets[left] = tickets[right];
             tickets[right] = temp_ticket;
         }
@@ -4397,7 +4397,7 @@ bool B8_QuickCloseMarketOrders(bool current_scope, int direction,
                              ? MarketInfo(order_symbol, MODE_BID)
                              : MarketInfo(order_symbol, MODE_ASK);
         close_price = NormalizeDouble(close_price, symbol_digits);
-        int ticket = OrderTicket();
+        ulong ticket = OrderTicket();
         double close_lots = OrderLots();
         ResetLastError();
         if (OrderClose(ticket, close_lots, close_price, Slippage, clrOrangeRed))
@@ -4435,7 +4435,7 @@ bool B8_QuickDeleteAllPending(string action_name)
         if (!OrderSelect(i, SELECT_BY_POS, MODE_TRADES)) continue;
         if (!B8_IsQuickPendingOrder(OrderType())) continue;
 
-        int ticket = OrderTicket();
+        ulong ticket = OrderTicket();
         ResetLastError();
         if (OrderDelete(ticket, clrSlateGray))
             success_count++;
@@ -4473,7 +4473,7 @@ bool B8_QuickClearAllOrders()
     {
         if (!OrderSelect(i, SELECT_BY_POS, MODE_TRADES)) continue;
         int order_type = OrderType();
-        int ticket = OrderTicket();
+        ulong ticket = OrderTicket();
         ResetLastError();
         if (order_type == OP_BUY || order_type == OP_SELL)
         {
@@ -4533,7 +4533,7 @@ bool B8_QuickDeleteManagedPending()
         if (!B8_IsQuickPendingOrder(OrderType())) continue;
         if (!B8_IsManagedOrder()) continue;
 
-        int ticket = OrderTicket();
+        ulong ticket = OrderTicket();
         ResetLastError();
         if (OrderDelete(ticket, clrSteelBlue))
             success_count++;

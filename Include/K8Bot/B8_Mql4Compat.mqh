@@ -126,11 +126,12 @@ string B8_OrderSymbol()
     return ::OrderGetString(ORDER_SYMBOL);
 }
 
-long B8_OrderMagicNumber()
+// MQL4 兼容接口中的 Magic 使用 int；MQL5 属性读取结果在此处明确收窄。
+int B8_OrderMagicNumber()
 {
-    if (g_B8_SelectedHistory) return (long)HistoryOrderGetInteger(g_B8_SelectedTicket, ORDER_MAGIC);
-    if (g_B8_SelectedPosition) return (long)PositionGetInteger(POSITION_MAGIC);
-    return (long)::OrderGetInteger(ORDER_MAGIC);
+    if (g_B8_SelectedHistory) return (int)HistoryOrderGetInteger(g_B8_SelectedTicket, ORDER_MAGIC);
+    if (g_B8_SelectedPosition) return (int)PositionGetInteger(POSITION_MAGIC);
+    return (int)::OrderGetInteger(ORDER_MAGIC);
 }
 
 int B8_OrderType()
@@ -249,9 +250,9 @@ double B8_AccountEquity() { return AccountInfoDouble(ACCOUNT_EQUITY); }
 long B8_AccountNumber() { return (long)AccountInfoInteger(ACCOUNT_LOGIN); }
 string B8_AccountCurrency() { return AccountInfoString(ACCOUNT_CURRENCY); }
 
-int B8_OrderSend(string symbol, int cmd, double volume, double price, int slippage,
-                 double stop_loss, double take_profit, string comment, int magic,
-                 datetime expiration, color arrow_color)
+ulong B8_OrderSend(string symbol, int cmd, double volume, double price, int slippage,
+                   double stop_loss, double take_profit, string comment, int magic,
+                   datetime expiration, color arrow_color)
 {
     g_B8_Trade.SetExpertMagicNumber((ulong)magic);
     g_B8_Trade.SetDeviationInPoints((ulong)slippage);
@@ -266,10 +267,10 @@ int B8_OrderSend(string symbol, int cmd, double volume, double price, int slippa
         sent = g_B8_Trade.OrderOpen(symbol, type, volume, 0.0, price, stop_loss,
                                     take_profit, ORDER_TIME_GTC, expiration, comment);
     }
-    if (!sent) return -1;
+    if (!sent) return 0;
     ulong ticket = g_B8_Trade.ResultOrder();
     if (ticket == 0) ticket = g_B8_Trade.ResultDeal();
-    return (int)ticket;
+    return ticket;
 }
 
 bool B8_OrderClose(ulong ticket, double lots, double price, int slippage, color arrow_color)

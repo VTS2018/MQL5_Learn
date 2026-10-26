@@ -54,8 +54,8 @@ B8_RUNTIME_TAKEOVER_STATE g_Runtime_Takeover_States[B8_RUNTIME_TAKEOVER_STATE_MA
 int                 g_Runtime_Takeover_State_Count = 0; // 当前接管状态数量
 B8_RUNTIME_ORDER_OVERRIDE g_Runtime_Order_Overrides[B8_RUNTIME_ORDER_MAX]; // 运行时订单策略覆盖记录
 int                 g_Runtime_Order_Override_Count = 0; // 当前有效的运行时订单策略数量
-int                 g_Runtime_Order_Selected_Ticket = -1; // 运行时订单面板当前选中的订单 Ticket
-int                 g_Runtime_Order_Row_Tickets[10]; // 运行时订单面板各行对应的订单 Ticket
+ulong               g_Runtime_Order_Selected_Ticket = 0; // 运行时订单面板当前选中的订单 Ticket
+ulong               g_Runtime_Order_Row_Tickets[10]; // 运行时订单面板各行对应的订单 Ticket
 int                 g_Runtime_Order_Row_Count = 0; // 运行时订单面板当前显示的订单行数
 ENUM_B8_ORDER_TRIGGER_MODE g_Runtime_Order_Edit_Mode = B8_ORDER_TRIGGER_R; // 运行时订单面板正在编辑的触发模式
 ENUM_B8_ORDER_PROTECTION_MODE g_Runtime_Order_Edit_Action = B8_ORDER_PARTIAL_BE; // 运行时订单面板正在编辑的保护动作
@@ -64,7 +64,7 @@ bool                g_Runtime_Order_Panel_Collapsed = true; // 运行时订单�
 
 //#region MARK: 模块--运行时订单策略多选应用状态
 ENUM_B8_RUNTIME_APPLY_SCOPE g_Runtime_Order_Apply_Scope = B8_RUNTIME_APPLY_CURRENT;
-int                 g_Runtime_Order_Selected_Tickets[B8_RUNTIME_ORDER_MAX];
+ulong               g_Runtime_Order_Selected_Tickets[B8_RUNTIME_ORDER_MAX];
 int                 g_Runtime_Order_Selected_Ticket_Count = 0;
 //#endregion
 

@@ -1675,7 +1675,7 @@ void B8_UpdateRuntimeOrderPanel()
         // if (OrderType() != OP_BUY && OrderType() != OP_SELL) continue;
         if (!OrderSelect(i, SELECT_BY_POS, MODE_TRADES))
         {
-            B8_LogRuntimeOrderFilterMismatch(i, -1, "OrderSelect失败");
+            B8_LogRuntimeOrderFilterMismatch(i, 0, "OrderSelect失败");
             continue;
         }
 
@@ -1711,7 +1711,7 @@ void B8_UpdateRuntimeOrderPanel()
             continue;
         }
 
-        int ticket = g_Runtime_Order_Row_Tickets[row];
+        ulong ticket = g_Runtime_Order_Row_Tickets[row];
         if (!OrderSelect(ticket, SELECT_BY_TICKET, MODE_TRADES)) continue;
         int logical_magic = OrderMagicNumber();
         // 旧版方向文本：
@@ -1745,7 +1745,7 @@ void B8_UpdateRuntimeOrderPanel()
         //               "|" + DoubleToString(current_r, 2) + "/" +
         //               DoubleToString(target_r, 2) + "|" + short_source;
         string selection_mark = B8_RuntimeOrderTicketIsSelected(ticket) ? "[X] " : "[ ] ";
-        string text = selection_mark + IntegerToString(ticket) + "|F" + fib + "|" + short_direction +
+        string text = selection_mark + StringFormat("%I64u", ticket) + "|F" + fib + "|" + short_direction +
                   "|" + DoubleToString(OrderLots(), 2) + "手|" + stop_risk_text +
                   "|" + DoubleToString(current_r, 2) + "/" +
                   DoubleToString(target_r, 2) + "|" + short_source;
@@ -1764,7 +1764,7 @@ void B8_UpdateRuntimeOrderPanel()
         !g_Runtime_Order_Inputs_Editing)
     {
         g_Runtime_Order_Selected_Ticket = g_Runtime_Order_Row_Count > 0
-                                          ? g_Runtime_Order_Row_Tickets[0] : -1;
+                                          ? g_Runtime_Order_Row_Tickets[0] : 0;
         if (g_Runtime_Order_Selected_Ticket > 0)
             B8_RuntimeOrderSelectTicket(g_Runtime_Order_Selected_Ticket);
     }
@@ -1775,7 +1775,7 @@ void B8_UpdateRuntimeOrderPanel()
         if (!OrderSelect(g_Runtime_Order_Selected_Ticket, SELECT_BY_TICKET, MODE_TRADES))
         {
             // B8_UpdateRuntimeOrderPanel(); // 已改为本次刷新直接降级，避免订单选择失败时递归刷新
-            g_Runtime_Order_Selected_Ticket = -1;
+            g_Runtime_Order_Selected_Ticket = 0;
             ObjectSetString(0, B8_RUNTIME_ORDER_STATUS, OBJPROP_TEXT,
                             "暂无已成交订单");
             ObjectSetString(0, B8_RUNTIME_ORDER_DETAIL1, OBJPROP_TEXT,
@@ -1794,7 +1794,7 @@ void B8_UpdateRuntimeOrderPanel()
                  : B8_RuntimeOrderFibCode(OrderComment());
         string direction = OrderType() == OP_BUY ? "BUY" : "SELL";
         ObjectSetString(0, B8_RUNTIME_ORDER_DETAIL1, OBJPROP_TEXT,
-                        "当前订单：" + IntegerToString(g_Runtime_Order_Selected_Ticket) +
+                        "当前订单：" + StringFormat("%I64u", g_Runtime_Order_Selected_Ticket) +
                         " F" + fib + " " + direction +
                         " | lot: " + DoubleToString(OrderLots(), 2));
         ObjectSetString(0, B8_RUNTIME_ORDER_DETAIL2, OBJPROP_TEXT,
@@ -1806,7 +1806,7 @@ void B8_UpdateRuntimeOrderPanel()
                         "当前R：" + DoubleToString(B8_RuntimeOrderCurrentR(g_Runtime_Order_Selected_Ticket), 2));
         ObjectSetString(0, B8_RUNTIME_ORDER_STATUS, OBJPROP_TEXT,
                         "已成交订单 " + IntegerToString(g_Runtime_Order_Row_Count) + " 笔 | 已选 " +
-                        IntegerToString(g_Runtime_Order_Selected_Ticket));
+                        StringFormat("%I64u", g_Runtime_Order_Selected_Ticket));
     }
     else
     {

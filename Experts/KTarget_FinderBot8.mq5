@@ -244,11 +244,11 @@ void       B8_ClearPartialCloseBlocked(int logical_magic);
 int        B8_ResetAllManagedOrdersToOrderLevel();
 void       B8_CleanupRuntimeTakeoverStates();
 //#endregion
-bool       B8_MoveOrderToBreakeven(int ticket, int type, double open_price);
-bool       B8_CloseOrderPartially(int ticket, int logical_magic, int type, double close_percent);
-bool       B8_CloseOrderFully(int ticket, int type);
+bool       B8_MoveOrderToBreakeven(ulong ticket, int type, double open_price);
+bool       B8_CloseOrderPartially(ulong ticket, int logical_magic, int type, double close_percent);
+bool       B8_CloseOrderFully(ulong ticket, int type);
 //#region MARK: 模块--运行时订单一键保本新增声明
-int        B8_ManualMoveRuntimeOrderToBreakeven(int ticket, int be_buffer_points);
+int        B8_ManualMoveRuntimeOrderToBreakeven(ulong ticket, int be_buffer_points);
 bool       B8_ExecuteRuntimeBreakevenAllManaged(int &moved_count,
                                                 int &already_count,
                                                 int &failed_count);
@@ -366,26 +366,26 @@ void       B8_SyncFibTemplateInputs();
 int        B8_FindRuntimeOrderOverride(int logical_magic);
 string     B8_RuntimeOrderRowName(int row);
 string     B8_RuntimeOrderFibCode(string comment);
-bool       B8_SelectRuntimeOrderByTicket(int ticket);
-bool       B8_RuntimeOrderIsOpen(int ticket);
-bool       B8_RuntimeOrderSelectTicket(int ticket);
-double     B8_RuntimeOrderCurrentR(int ticket);
+bool       B8_SelectRuntimeOrderByTicket(ulong ticket);
+bool       B8_RuntimeOrderIsOpen(ulong ticket);
+bool       B8_RuntimeOrderSelectTicket(ulong ticket);
+double     B8_RuntimeOrderCurrentR(ulong ticket);
 bool       B8_TryGetCurrentOrderStopRisk(double &risk_money);
 bool       B8_ApplyRuntimeOrderOverride();
 //#region MARK: 模块--运行时订单策略多选应用新增声明
-bool       B8_RuntimeOrderTicketIsSelected(int ticket);
-void       B8_RuntimeOrderToggleSelectedTicket(int ticket);
+bool       B8_RuntimeOrderTicketIsSelected(ulong ticket);
+void       B8_RuntimeOrderToggleSelectedTicket(ulong ticket);
 void       B8_RuntimeOrderPruneSelectedTickets();
 void       B8_RuntimeOrderCycleApplyScope();
 void       B8_RuntimeOrderUpdateApplyScopeControl();
-bool       B8_ApplyRuntimeOrderOverrideToTicket(int ticket,
+bool       B8_ApplyRuntimeOrderOverrideToTicket(ulong ticket,
                                                 double trigger_value,
                                                 double close_percent,
                                                 int be_buffer);
 bool       B8_ApplyRuntimeOrderOverrideByScope(int &success_count,
                                                int &failure_count);
 void       B8_LogRuntimeOrderFilterMismatch(int position,
-                                            int ticket,
+                                            ulong ticket,
                                             string reason);
 //#endregion
 void       B8_ClearRuntimeOrderOverride(int logical_magic);
@@ -413,7 +413,7 @@ void       B8_SetRuntimeCloseStatus(string text, bool success);
 bool       B8_ExecuteRuntimeClosePercent(double percent);
 bool       B8_ExecuteRuntimeCloseLots(double lots);
 double     B8_NormalizeManualCloseLots(double lots);
-bool       B8_CloseManualOrderLots(int ticket, double requested_lots, color close_color);
+bool       B8_CloseManualOrderLots(ulong ticket, double requested_lots, color close_color);
 bool       B8_CloseSelectedManualLots(double lots);
 bool       B8_CloseSelectedManualPercent(double percent);
 bool       B8_CloseManagedManualLots(double lots);
