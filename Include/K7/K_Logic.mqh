@@ -3648,9 +3648,10 @@ void Init_Object_prefix()
 
     // [V1.32 NEW] 生成唯一的对象名前缀
     g_object_prefix = ShortenObjectName(MQLInfoString(MQL_PROGRAM_NAME)) + StringFormat("_%d_", MathAbs(short_chart_id));
-    g_fibo_object_prefix = "KTFIBO_" +
-                           ShortenObjectName(MQLInfoString(MQL_PROGRAM_NAME)) +
-                           StringFormat("_%d_", MathAbs(short_chart_id));
+    g_fibo_object_prefix =
+        ShortenObjectName(MQLInfoString(MQL_PROGRAM_NAME)) +
+        "_F_" +
+        StringFormat("%d_", MathAbs(short_chart_id));
     // Print("-->[KTarget_Finder5.mq4:165]: g_object_prefix: ", g_object_prefix);
 }
 
