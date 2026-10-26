@@ -341,6 +341,8 @@ void       B8_CreateRuntimeOrderPanel();
 void       B8_UpdateRuntimeOrderPanel();
 bool       B8_HandleRuntimeOrderPanelEvent(const string object_name);
 void       B8_SetRuntimeOrderPanelCollapsed(bool collapsed);
+bool       B8_InitializeRuntimeOrderPanelObjects();
+void       B8_SetRuntimeOrderPanelCollapsedFast(bool collapsed);
 bool       B8_HasRuntimeOrderOverride(int logical_magic);
 bool       B8_ManageRuntimeOrderProtection(int ticket, int type);
 void       B8_CreateFibTemplatePanel();
@@ -348,6 +350,8 @@ void       B8_UpdateFibTemplatePanel();
 bool       B8_HandleFibTemplatePanelEvent(const string object_name);
 bool       B8_HandleFibPanelEvent(const string object_name);
 void       B8_SetFibTemplatePanelCollapsed(bool collapsed);
+bool       B8_InitializeFibTemplatePanelObjects();
+void       B8_SetFibTemplatePanelCollapsedFast(bool collapsed);
 void       B8_InitializeFibOrderTemplates();
 int        B8_FibTemplateIndexFromCode(string fib_code);
 bool       B8_ApplyFibTemplate();
@@ -652,10 +656,14 @@ int OnInit()
     B8_InitializePanels();
     B8_CreateRuntimeOrderPanel();
     B8_UpdateRuntimeOrderPanel();
-    B8_SetRuntimeOrderPanelCollapsed(true);
+    // B8_SetRuntimeOrderPanelCollapsed(true); // 旧版运行时查询、删除路径保留供回溯
+    if (B8_InitializeRuntimeOrderPanelObjects())
+        B8_SetRuntimeOrderPanelCollapsedFast(true);
     B8_CreateFibTemplatePanel();
     B8_UpdateFibTemplatePanel();
-    B8_SetFibTemplatePanelCollapsed(true);
+    // B8_SetFibTemplatePanelCollapsed(true); // 旧版运行时查询路径保留供回溯
+    if (B8_InitializeFibTemplatePanelObjects())
+        B8_SetFibTemplatePanelCollapsedFast(true);
 
     //#region MARK: 模块--EA自动开启独立模块接入
     B8_AutoActivation_Initialize();

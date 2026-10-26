@@ -2057,6 +2057,127 @@ void B8_SetRuntimeOrderPanelCollapsed(bool collapsed)
     ChartRedraw();
 }
 
+//#region MARK: 模块--运行时订单面板初始化对象检查与快速折叠
+bool g_B8_RuntimeOrderPanelObjectsReady = false;
+
+bool B8_InitializeRuntimeOrderPanelObjects()
+{
+    string objects[] =
+    {
+        B8_RUNTIME_ORDER_PANEL_BG, B8_RUNTIME_ORDER_TITLE,
+        B8_RUNTIME_ORDER_COLLAPSE, B8_RUNTIME_ORDER_STATUS,
+        B8_RUNTIME_QUICK_STATUS,
+        B8_RUNTIME_ORDER_DETAIL1, B8_RUNTIME_ORDER_DETAIL2,
+        B8_RUNTIME_ORDER_DETAIL3, B8_RUNTIME_ORDER_DETAIL4,
+        "B8_RuntimeOrderLabelR", B8_RUNTIME_ORDER_EDIT_R,
+        "B8_RuntimeOrderLabelClose", B8_RUNTIME_ORDER_EDIT_CLOSE,
+        "B8_RuntimeOrderLabelBE", B8_RUNTIME_ORDER_EDIT_BE,
+        B8_RUNTIME_ORDER_MODE_R, B8_RUNTIME_ORDER_MODE_POINTS,
+        B8_RUNTIME_ORDER_ACTION_PARTIAL, B8_RUNTIME_ORDER_ACTION_BE,
+        B8_RUNTIME_ORDER_ACTION_PARTIAL_BE, B8_RUNTIME_ORDER_ACTION_CLOSE,
+        B8_RUNTIME_ORDER_APPLY, B8_RUNTIME_ORDER_DEFAULT,
+        B8_RUNTIME_ORDER_DISABLE, B8_RUNTIME_ORDER_APPLY_SCOPE,
+        B8_RUNTIME_ORDER_BREAKEVEN, B8_RUNTIME_ORDER_TAKEOVER,
+        B8_RUNTIME_ORDER_CLOSE_DIVIDER,
+        "B8_RuntimeCloseScopeLabel", B8_RUNTIME_CLOSE_SCOPE_ONE,
+        B8_RUNTIME_CLOSE_SCOPE_ALL, "B8_RuntimeClosePercentLabel",
+        B8_RUNTIME_CLOSE_PERCENT_50, B8_RUNTIME_CLOSE_PERCENT_80,
+        B8_RUNTIME_CLOSE_PERCENT_100, B8_RUNTIME_CLOSE_PERCENT_EDIT,
+        B8_RUNTIME_CLOSE_PERCENT_GO,
+        "B8_RuntimeCloseLotsLabel", B8_RUNTIME_CLOSE_LOTS_1,
+        B8_RUNTIME_CLOSE_LOTS_01, B8_RUNTIME_CLOSE_LOTS_001,
+        B8_RUNTIME_CLOSE_LOTS_EDIT, B8_RUNTIME_CLOSE_LOTS_GO,
+        "B8_RuntimeQuickTitle", B8_RUNTIME_QUICK_THIS_ALL,
+        B8_RUNTIME_QUICK_THIS_LOSS, B8_RUNTIME_QUICK_THIS_PROFIT,
+        B8_RUNTIME_QUICK_THIS_SELL, B8_RUNTIME_QUICK_THIS_BUY,
+        B8_RUNTIME_QUICK_ALL_LOSS, B8_RUNTIME_QUICK_ALL_PROFIT,
+        B8_RUNTIME_QUICK_ALL_SELL, B8_RUNTIME_QUICK_ALL_BUY,
+        B8_RUNTIME_QUICK_CLEAR_ALL, B8_RUNTIME_QUICK_DELETE_PENDING,
+        B8_RUNTIME_QUICK_DELETE_MANAGED
+    };
+
+    g_B8_RuntimeOrderPanelObjectsReady = true;
+    for (int i = 0; i < ArraySize(objects); i++)
+    {
+        if (ObjectFind(0, objects[i]) >= 0) continue;
+        Print("[Bot8][运行时订单] 初始化对象缺失：", objects[i]);
+        g_B8_RuntimeOrderPanelObjectsReady = false;
+    }
+
+    for (int row = 0; row < 10; row++)
+    {
+        string row_name = B8_RuntimeOrderRowName(row);
+        if (ObjectFind(0, row_name) >= 0) continue;
+        Print("[Bot8][运行时订单] 初始化订单行对象缺失：", row_name);
+        g_B8_RuntimeOrderPanelObjectsReady = false;
+    }
+
+    if (!g_B8_RuntimeOrderPanelObjectsReady)
+        Print("[Bot8][运行时订单] 初始化检查失败，禁止启用快速折叠路径。");
+    else
+        Print("[Bot8][运行时订单] 初始化对象检查通过，运行时折叠不再查询对象。");
+
+    return g_B8_RuntimeOrderPanelObjectsReady;
+}
+
+void B8_SetRuntimeOrderPanelCollapsedFast(bool collapsed)
+{
+    if (!g_B8_RuntimeOrderPanelObjectsReady)
+    {
+        Print("[Bot8][运行时订单] 快速折叠路径不可用：初始化对象检查未通过。");
+        return;
+    }
+
+    g_Runtime_Order_Panel_Collapsed = collapsed;
+    long timeframes = collapsed ? OBJ_NO_PERIODS : OBJ_ALL_PERIODS;
+    string objects[] =
+    {
+        B8_RUNTIME_ORDER_STATUS, B8_RUNTIME_QUICK_STATUS,
+        B8_RUNTIME_ORDER_DETAIL1, B8_RUNTIME_ORDER_DETAIL2,
+        B8_RUNTIME_ORDER_DETAIL3, B8_RUNTIME_ORDER_DETAIL4,
+        "B8_RuntimeOrderLabelR", B8_RUNTIME_ORDER_EDIT_R,
+        "B8_RuntimeOrderLabelClose", B8_RUNTIME_ORDER_EDIT_CLOSE,
+        "B8_RuntimeOrderLabelBE", B8_RUNTIME_ORDER_EDIT_BE,
+        B8_RUNTIME_ORDER_MODE_R, B8_RUNTIME_ORDER_MODE_POINTS,
+        B8_RUNTIME_ORDER_ACTION_PARTIAL, B8_RUNTIME_ORDER_ACTION_BE,
+        B8_RUNTIME_ORDER_ACTION_PARTIAL_BE, B8_RUNTIME_ORDER_ACTION_CLOSE,
+        B8_RUNTIME_ORDER_APPLY, B8_RUNTIME_ORDER_DEFAULT,
+        B8_RUNTIME_ORDER_DISABLE, B8_RUNTIME_ORDER_APPLY_SCOPE,
+        B8_RUNTIME_ORDER_BREAKEVEN, B8_RUNTIME_ORDER_TAKEOVER,
+        B8_RUNTIME_ORDER_CLOSE_DIVIDER,
+        "B8_RuntimeCloseScopeLabel", B8_RUNTIME_CLOSE_SCOPE_ONE,
+        B8_RUNTIME_CLOSE_SCOPE_ALL, "B8_RuntimeClosePercentLabel",
+        B8_RUNTIME_CLOSE_PERCENT_50, B8_RUNTIME_CLOSE_PERCENT_80,
+        B8_RUNTIME_CLOSE_PERCENT_100, B8_RUNTIME_CLOSE_PERCENT_EDIT,
+        B8_RUNTIME_CLOSE_PERCENT_GO,
+        "B8_RuntimeCloseLotsLabel", B8_RUNTIME_CLOSE_LOTS_1,
+        B8_RUNTIME_CLOSE_LOTS_01, B8_RUNTIME_CLOSE_LOTS_001,
+        B8_RUNTIME_CLOSE_LOTS_EDIT, B8_RUNTIME_CLOSE_LOTS_GO,
+        "B8_RuntimeQuickTitle", B8_RUNTIME_QUICK_THIS_ALL,
+        B8_RUNTIME_QUICK_THIS_LOSS, B8_RUNTIME_QUICK_THIS_PROFIT,
+        B8_RUNTIME_QUICK_THIS_SELL, B8_RUNTIME_QUICK_THIS_BUY,
+        B8_RUNTIME_QUICK_ALL_LOSS, B8_RUNTIME_QUICK_ALL_PROFIT,
+        B8_RUNTIME_QUICK_ALL_SELL, B8_RUNTIME_QUICK_ALL_BUY,
+        B8_RUNTIME_QUICK_CLEAR_ALL, B8_RUNTIME_QUICK_DELETE_PENDING,
+        B8_RUNTIME_QUICK_DELETE_MANAGED
+    };
+
+    for (int i = 0; i < ArraySize(objects); i++)
+        ObjectSetInteger(0, objects[i], OBJPROP_TIMEFRAMES, timeframes);
+    for (int row = 0; row < 10; row++)
+    {
+        string row_name = B8_RuntimeOrderRowName(row);
+        ObjectSetInteger(0, row_name, OBJPROP_TIMEFRAMES, timeframes);
+    }
+
+    ObjectSetInteger(0, B8_RUNTIME_ORDER_PANEL_BG, OBJPROP_YSIZE,
+                     collapsed ? 32 : 678);
+    ObjectSetString(0, B8_RUNTIME_ORDER_COLLAPSE, OBJPROP_TEXT,
+                    collapsed ? "展开" : "折叠");
+    ChartRedraw();
+}
+//#endregion
+
 // 折叠或展开 Fib 成交前策略模板面板。
 // 折叠时保留标题栏，展开时调用原创建函数恢复模板编辑控件。
 void B8_SetFibTemplatePanelCollapsed(bool collapsed)
@@ -2101,6 +2222,94 @@ void B8_SetFibTemplatePanelCollapsed(bool collapsed)
     ObjectSetString(0, B8_FIB_TEMPLATE_COLLAPSE, OBJPROP_TEXT, "展开");
     ChartRedraw();
 }
+
+//#region MARK: 模块--Fib模板面板初始化对象检查与快速折叠
+bool g_B8_FibTemplatePanelObjectsReady = false;
+
+// 初始化阶段一次性确认 Fib 模板面板的全部对象已经创建。
+// 运行时折叠/展开不再重复查询对象是否存在。
+bool B8_InitializeFibTemplatePanelObjects()
+{
+    string objects[] =
+    {
+        B8_FIB_TEMPLATE_PANEL_BG, B8_FIB_TEMPLATE_TITLE,
+        B8_FIB_TEMPLATE_COLLAPSE, B8_FIB_TEMPLATE_STATUS,
+        "B8_FibTemplateLabelValue", B8_FIB_TEMPLATE_EDIT_VALUE,
+        "B8_FibTemplateLabelClose", B8_FIB_TEMPLATE_EDIT_CLOSE,
+        "B8_FibTemplateLabelBE", B8_FIB_TEMPLATE_EDIT_BE,
+        B8_FIB_TEMPLATE_MODE_R, B8_FIB_TEMPLATE_MODE_POINTS,
+        B8_FIB_TEMPLATE_ACTION_PARTIAL, B8_FIB_TEMPLATE_ACTION_BE,
+        B8_FIB_TEMPLATE_ACTION_PARTIAL_BE, B8_FIB_TEMPLATE_ACTION_CLOSE,
+        B8_FIB_TEMPLATE_APPLY,
+        B8_FIB_TEMPLATE_PRESET_SAFE, B8_FIB_TEMPLATE_PRESET_STD,
+        B8_FIB_TEMPLATE_PRESET_FAST, B8_FIB_TEMPLATE_RESET
+    };
+
+    g_B8_FibTemplatePanelObjectsReady = true;
+    for (int i = 0; i < ArraySize(objects); i++)
+    {
+        if (ObjectFind(0, objects[i]) >= 0) continue;
+        Print("[Bot8][Fib模板] 初始化对象缺失：", objects[i]);
+        g_B8_FibTemplatePanelObjectsReady = false;
+    }
+
+    for (int row = 0; row < 8; row++)
+    {
+        string row_name = B8_FibTemplateRowName(row);
+        if (ObjectFind(0, row_name) >= 0) continue;
+        Print("[Bot8][Fib模板] 初始化订单行对象缺失：", row_name);
+        g_B8_FibTemplatePanelObjectsReady = false;
+    }
+
+    if (!g_B8_FibTemplatePanelObjectsReady)
+        Print("[Bot8][Fib模板] 初始化检查失败，禁止启用快速折叠路径。");
+    else
+        Print("[Bot8][Fib模板] 初始化对象检查通过，运行时折叠不再查询对象。");
+
+    return g_B8_FibTemplatePanelObjectsReady;
+}
+
+// 运行时快速切换 Fib 模板面板可见性，不执行 ObjectFind/ObjectCreate/ObjectDelete。
+void B8_SetFibTemplatePanelCollapsedFast(bool collapsed)
+{
+    if (!g_B8_FibTemplatePanelObjectsReady)
+    {
+        Print("[Bot8][Fib模板] 快速折叠路径不可用：初始化对象检查未通过。");
+        return;
+    }
+
+    g_Fib_Template_Panel_Collapsed = collapsed;
+    long timeframes = collapsed ? OBJ_NO_PERIODS : OBJ_ALL_PERIODS;
+    string objects[] =
+    {
+        B8_FIB_TEMPLATE_STATUS,
+        "B8_FibTemplateLabelValue", B8_FIB_TEMPLATE_EDIT_VALUE,
+        "B8_FibTemplateLabelClose", B8_FIB_TEMPLATE_EDIT_CLOSE,
+        "B8_FibTemplateLabelBE", B8_FIB_TEMPLATE_EDIT_BE,
+        B8_FIB_TEMPLATE_MODE_R, B8_FIB_TEMPLATE_MODE_POINTS,
+        B8_FIB_TEMPLATE_ACTION_PARTIAL, B8_FIB_TEMPLATE_ACTION_BE,
+        B8_FIB_TEMPLATE_ACTION_PARTIAL_BE, B8_FIB_TEMPLATE_ACTION_CLOSE,
+        B8_FIB_TEMPLATE_APPLY,
+        B8_FIB_TEMPLATE_PRESET_SAFE, B8_FIB_TEMPLATE_PRESET_STD,
+        B8_FIB_TEMPLATE_PRESET_FAST, B8_FIB_TEMPLATE_RESET
+    };
+
+    for (int i = 0; i < ArraySize(objects); i++)
+        ObjectSetInteger(0, objects[i], OBJPROP_TIMEFRAMES, timeframes);
+    for (int row = 0; row < 8; row++)
+    {
+        string row_name = B8_FibTemplateRowName(row);
+        ObjectSetInteger(0, row_name, OBJPROP_TIMEFRAMES, timeframes);
+    }
+
+    ObjectSetInteger(0, B8_FIB_TEMPLATE_PANEL_BG, OBJPROP_YSIZE,
+                     collapsed ? 32 : 360);
+    ObjectSetString(0, B8_FIB_TEMPLATE_COLLAPSE, OBJPROP_TEXT,
+                    collapsed ? "展开" : "折叠");
+    ChartRedraw();
+}
+//#endregion
+
 //#endregion
 
 //#region MARK: 面板事件处理
@@ -2188,7 +2397,8 @@ bool B8_HandleRuntimeOrderPanelEvent(const string object_name)
     if (object_name == B8_RUNTIME_ORDER_COLLAPSE)
     {
         ObjectSetInteger(0, object_name, OBJPROP_STATE, false);
-        B8_SetRuntimeOrderPanelCollapsed(!g_Runtime_Order_Panel_Collapsed);
+        // B8_SetRuntimeOrderPanelCollapsed(!g_Runtime_Order_Panel_Collapsed); // 旧版运行时查询、删除路径保留供回溯
+        B8_SetRuntimeOrderPanelCollapsedFast(!g_Runtime_Order_Panel_Collapsed);
         return true;
     }
 
@@ -2433,7 +2643,8 @@ bool B8_HandleFibTemplatePanelEvent(const string object_name)
     if (object_name == B8_FIB_TEMPLATE_COLLAPSE)
     {
         ObjectSetInteger(0, object_name, OBJPROP_STATE, false);
-        B8_SetFibTemplatePanelCollapsed(!g_Fib_Template_Panel_Collapsed);
+        // B8_SetFibTemplatePanelCollapsed(!g_Fib_Template_Panel_Collapsed); // 旧版运行时查询路径保留供回溯
+        B8_SetFibTemplatePanelCollapsedFast(!g_Fib_Template_Panel_Collapsed);
         return true;
     }
 
