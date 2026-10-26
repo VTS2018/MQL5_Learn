@@ -1692,7 +1692,10 @@ bool DrawFVGAtBar(int middleBar)
    }
 
    datetime startTime = iTime(NULL, 0, oldBar);
-   datetime endTime = iTime(NULL, 0, newBar) + PeriodSeconds() * MathMax(FVG_Extend_Bars, 1);
+   // 旧逻辑：从右侧新K线继续向右固定延伸 FVG_Extend_Bars 个周期。
+   // datetime endTime = iTime(NULL, 0, newBar) + PeriodSeconds() * MathMax(FVG_Extend_Bars, 1);
+   // 新逻辑：创建时将矩形终点指向当前最新K线 K[0] 的开盘时间。
+   datetime endTime = iTime(NULL, 0, 0);
    double middlePrice = (upperPrice + lowerPrice) / 2.0;
    string direction = isBullish ? "Bull" : "Bear";
    string prefix = isPermanentMode ? "Keep_" : "Draw_";
