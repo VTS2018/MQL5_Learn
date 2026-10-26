@@ -3,6 +3,19 @@
 // 本文件原样承载主文件中的用户界面逻辑。
 //====================================================================
 
+//#region MARK: 模块--面板初始化总调度入口
+// Bot8 全部主面板初始化总调度入口。
+void B8_InitializePanels()
+{
+    B8_CreatePanel();
+    B8_CreateRiskPanel();
+    B8_UpdateRiskPanel();
+    B8_SetCorePanelsVisible(g_SettingsPanelVisible);
+    B8_UpdatePanel();
+    ChartRedraw();
+}
+//#endregion
+
 //#region MARK: 通用控件创建1
 //====================================================================
 // 面板底层辅助函数: B8_MakeRectLabel

@@ -1463,16 +1463,6 @@ void OnChartEvent(const int id,
 #include <K8Bot/B8_AutoActivation.mqh>
 //#endregion
 
-// Bot8 全部主面板初始化总调度入口。
-void B8_InitializePanels()
-{
-    B8_CreatePanel();
-    B8_CreateRiskPanel();
-    B8_UpdateRiskPanel();
-    B8_SetCorePanelsVisible(g_SettingsPanelVisible);
-    B8_UpdatePanel();
-    ChartRedraw();
-}
 //+------------------------------------------------------------------+
 // END OF FILE
 //+------------------------------------------------------------------+
