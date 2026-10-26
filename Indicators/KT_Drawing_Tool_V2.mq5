@@ -2909,6 +2909,7 @@ void UpdateRoundNumberLines()
 //+------------------------------------------------------------------+
 void DeleteRoundNumberLines()
 {
+   /*
    int total = ObjectsTotal(0, 0, -1);
    int deleteCount = 0;
    
@@ -2938,7 +2939,11 @@ void DeleteRoundNumberLines()
       }
    }
    
-   if(deleteCount > 0 && Enable_Log_RoundLines)
+   */
+   int deleteCount = ObjectsDeleteAll(0, "Round_", -1, -1);
+   int labelDeleteCount = ObjectsDeleteAll(0, "RoundLabel_", -1, -1);
+
+   if((deleteCount > 0 || labelDeleteCount > 0) && Enable_Log_RoundLines)
    {
       Print("[关口线] 清理: 删除 ", deleteCount, " 条关口线及标签");
    }
@@ -3178,6 +3183,7 @@ void UpdateBeijingDayOpenMarks()
 //+------------------------------------------------------------------+
 void DeleteBeijingDayOpenMarks()
 {
+   /*
    int total = ObjectsTotal(0, 0, -1);
    int deleteCount = 0;
    
@@ -3194,6 +3200,9 @@ void DeleteBeijingDayOpenMarks()
       }
    }
    
+   */
+   int deleteCount = ObjectsDeleteAll(0, "BJDayOpen_", -1, -1);
+
    if(deleteCount > 0)
    {
       Print("[北京日开盘] 清理: 删除 ", deleteCount, " 个标注对象（含标签）");
