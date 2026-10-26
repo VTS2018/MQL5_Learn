@@ -6,6 +6,8 @@
 //+------------------------------------------------------------------+
 
 //#region MARK: 创建严格模式按钮
+string g_fibo_object_prefix = "";
+
 // 严格模式按钮在图表对象中的唯一名称，用于创建、查找和点击识别。
 string Strict_Mode_Button_Name = "KTarget_StrictMode_Button";
 // 严格+Honest模式按钮在图表对象中的唯一名称，用于创建、查找和点击识别。
@@ -3646,6 +3648,9 @@ void Init_Object_prefix()
 
     // [V1.32 NEW] 生成唯一的对象名前缀
     g_object_prefix = ShortenObjectName(MQLInfoString(MQL_PROGRAM_NAME)) + StringFormat("_%d_", MathAbs(short_chart_id));
+    g_fibo_object_prefix = "KTFIBO_" +
+                           ShortenObjectName(MQLInfoString(MQL_PROGRAM_NAME)) +
+                           StringFormat("_%d_", MathAbs(short_chart_id));
     // Print("-->[KTarget_Finder5.mq4:165]: g_object_prefix: ", g_object_prefix);
 }
 
@@ -3708,7 +3713,8 @@ void DeInit_DelObject()
         }
         */
 
-        // 2.0 遍历图表上的所有对象，从后向前扫描
+        /*
+        // 2.0 旧逻辑：遍历图表上的所有对象，从后向前扫描并逐个删除。
         for (int i = ObjectsTotal(0, -1, -1) - 1; i >= 0; i--)
         {
             string obj_name = ObjectName(0, i);
@@ -3731,6 +3737,10 @@ void DeInit_DelObject()
                 ObjectDelete(0, obj_name);
             }
         }
+        */
+
+        // 批量删除普通对象；Fibo 使用独立前缀，因此不会被本次清理删除。
+        ObjectsDeleteAll(0, g_object_prefix, -1, -1);
 
         // ------------------- 0.0 下面的代码保持不变 -------------------
         ChartRedraw();
@@ -3844,10 +3854,10 @@ void HandleObjectDelete(string sparam)
     // Print("--->[KTarget_Finder5.mq4:595]: deleted_name: ", deleted_name);
 
     // 1. 过滤：检查被删除的对象是否为我们指标绘制的 '主' 斐波那契线
-    // 条件：a) 必须包含指标前缀 g_object_prefix
+    // 条件：a) 必须包含斐波对象专用前缀 g_fibo_object_prefix
     //       b) 必须包含 "_Fibo_" (斐波那契主线的标记)
     //       c) 必须不包含 "_FiboHL_" (排除高亮矩形本身)
-    if (StringFind(deleted_name, g_object_prefix) != -1 &&
+    if (StringFind(deleted_name, g_fibo_object_prefix) != -1 &&
         StringFind(deleted_name, "_Fibo_") != -1 &&
         StringFind(deleted_name, "_FiboHL_") == -1)
     {

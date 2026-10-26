@@ -591,7 +591,7 @@ void DrawP1P2Fibonacci(int target_index, int P2_index, bool is_bullish)
     // --- 对象创建与设置 ---
     // 名称使用唯一的对象名前缀
     string time_id_str = GetBarTimeID(target_index);
-    string name = g_object_prefix + (is_bullish ? "Fibo_B_" : "Fibo_S_") + time_id_str;
+    string name = g_fibo_object_prefix + (is_bullish ? "Fibo_B_" : "Fibo_S_") + time_id_str;
     //Print(">>> DrawP1P2Fibonacci: Drawing Fibo ", name);
 
     // 检查对象是否已存在
@@ -860,7 +860,7 @@ void ExecuteDrawFiboRects(int target_index, int P2_index, bool is_bullish, const
         // double price_top = price_end;
 
         // 2. 命名对象，使用特殊标记 "_FiboHL_" 满足周期切换不删除需求
-        string name = g_object_prefix + "Rect_FiboHL_" + (is_bullish ? "B_" : "S_") + GetBarTimeID(target_index) + "#" + DoubleToString(level1, 3) + "_" + DoubleToString(level2, 3);
+        string name = g_fibo_object_prefix + "Rect_FiboHL_" + (is_bullish ? "B_" : "S_") + GetBarTimeID(target_index) + "#" + DoubleToString(level1, 3) + "_" + DoubleToString(level2, 3);
         // Print("===>[K_Drawing_Funcs.mqh:624]: name: ", name);
 
         string text_name = name + "_TXT";
