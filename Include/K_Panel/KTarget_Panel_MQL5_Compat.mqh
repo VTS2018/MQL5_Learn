@@ -215,7 +215,13 @@ int OrderSend(const string symbol, const int type, const double volume, const do
       case OP_BUYSTOP:   result = g_ktTrade.BuyStop(volume, price, symbol, sl, tp, ORDER_TIME_GTC, expiration, comment); break;
       case OP_SELLSTOP:  result = g_ktTrade.SellStop(volume, price, symbol, sl, tp, ORDER_TIME_GTC, expiration, comment); break;
    }
-   if(!result) return(-1);
+   if(!result)
+   {
+      Print("[ERR] CTrade request rejected. retcode=",
+            IntegerToString((int)g_ktTrade.ResultRetcode()), " ",
+            g_ktTrade.ResultRetcodeDescription());
+      return(-1);
+   }
    ulong ticket = g_ktTrade.ResultOrder();
    if(ticket == 0) ticket = g_ktTrade.ResultDeal();
    return((int)ticket);

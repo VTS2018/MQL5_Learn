@@ -1497,6 +1497,7 @@ void CTradePanel::OnClickBuy(void)
       int err = GetLastError();
       string errMsg = "买入失败! 错误码=" + IntegerToString(err);
       if(err == 4109) errMsg += " (未开启交易权限，请开启AutoTrading)";
+      if(err == 4756) errMsg += " (交易请求被服务器拒绝，请检查账户和品种的交易权限；服务器禁用时EA无法绕过)";
       if(err == 130)  errMsg += " (止损/止盈价格无效)";
       if(err == 131)  errMsg += " (手数无效)";
       if(err == 138)  errMsg += " (报价变动，重试)";
@@ -1547,6 +1548,7 @@ void CTradePanel::OnClickSell(void)
       int err = GetLastError();
       string errMsg = "卖出失败! 错误码=" + IntegerToString(err);
       if(err == 4109) errMsg += " (未开启交易权限，请开启AutoTrading)";
+      if(err == 4756) errMsg += " (交易请求被服务器拒绝，请检查账户和品种的交易权限；服务器禁用时EA无法绕过)";
       if(err == 130)  errMsg += " (止损/止盈价格无效)";
       if(err == 131)  errMsg += " (手数无效)";
       if(err == 138)  errMsg += " (报价变动，重试)";
@@ -1610,6 +1612,7 @@ void CTradePanel::OnClickBuyLimit(void)
       int err = GetLastError();
       string errMsg = "Buy Limit挂单失败! 错误码=" + IntegerToString(err);
       if(err == 4109) errMsg += " (未开启交易权限)";
+      if(err == 4756) errMsg += " (交易请求被服务器拒绝，请检查账户和品种的交易权限；服务器禁用时EA无法绕过)";
       if(err == 130)  errMsg += " (价格无效)";
       if(err == 131)  errMsg += " (手数无效)";
       if(err == 138)  errMsg += " (报价变动，重试)";
@@ -1673,6 +1676,7 @@ void CTradePanel::OnClickSellLimit(void)
       int err = GetLastError();
       string errMsg = "Sell Limit挂单失败! 错误码=" + IntegerToString(err);
       if(err == 4109) errMsg += " (未开启交易权限)";
+      if(err == 4756) errMsg += " (交易请求被服务器拒绝，请检查账户和品种的交易权限；服务器禁用时EA无法绕过)";
       if(err == 130)  errMsg += " (价格无效)";
       if(err == 131)  errMsg += " (手数无效)";
       if(err == 138)  errMsg += " (报价变动，重试)";
@@ -1736,6 +1740,7 @@ void CTradePanel::OnClickBuyStop(void)
       int err = GetLastError();
       string errMsg = "Buy Stop挂单失败! 错误码=" + IntegerToString(err);
       if(err == 4109) errMsg += " (未开启交易权限)";
+      if(err == 4756) errMsg += " (交易请求被服务器拒绝，请检查账户和品种的交易权限；服务器禁用时EA无法绕过)";
       if(err == 130)  errMsg += " (价格无效)";
       if(err == 131)  errMsg += " (手数无效)";
       if(err == 138)  errMsg += " (报价变动，重试)";
@@ -1799,6 +1804,7 @@ void CTradePanel::OnClickSellStop(void)
       int err = GetLastError();
       string errMsg = "Sell Stop挂单失败! 错误码=" + IntegerToString(err);
       if(err == 4109) errMsg += " (未开启交易权限)";
+      if(err == 4756) errMsg += " (交易请求被服务器拒绝，请检查账户和品种的交易权限；服务器禁用时EA无法绕过)";
       if(err == 130)  errMsg += " (价格无效)";
       if(err == 131)  errMsg += " (手数无效)";
       if(err == 138)  errMsg += " (报价变动，重试)";
